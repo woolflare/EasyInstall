@@ -1,0 +1,15 @@
+{
+    "acme.sh": "https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh",
+    "dnsproxy.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/dnsproxy.sh",
+    "docker.sh": "https://raw.githubusercontent.com/docker/docker-install/master/install.sh",
+    "helm.sh": "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3",
+    "homebrew.sh": "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh",
+    "hysteria2.sh": "https://raw.githubusercontent.com/apernet/hysteria/master/scripts/install_server.sh",
+    "ohmyzsh.sh": "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh",
+    "rustup.sh": "https://raw.githubusercontent.com/rust-lang/rustup/master/rustup-init.sh",
+    "rvm.sh": "https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer",
+    "snell.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/snell.sh",
+    "speedtest.sh": "https://raw.githubusercontent.com/P3TERX/script/master/speedtest-cli.sh",
+    "v2ray.sh": "https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh",
+    "yarn.sh": "https://raw.githubusercontent.com/yarnpkg/website/master/install.sh"
+}
