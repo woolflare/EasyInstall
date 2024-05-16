@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File List</title>
+    <meta name="description" content="Automatic installation script collection.">
+    <title>Install Scripts - install.is</title>
 </head>
 <body>
-    <h1>File List</h1>
+    <h1>Usage</h1>
+    <p>To install a specific package using <code>install.is</code>, use the following <code>curl</code> command:</p>
+    <pre><code>curl -L install.is/[package_name] | bash</code></pre>
+    <p>Replace <code>[package_name]</code> with the name of the desired script. For example, to install <code>acme.sh</code>, you would use:</p>
+    <pre><code>curl -L install.is/acme.sh | bash</code></pre>
+    <h1>Available Scripts List</h1>
     <table border="1">
-        <tr><th>File Name</th><th>URL</th></tr>
-        <tr><td>acme.sh</td><td><a href="https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh">https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh</a></td></tr>
+        <thead>
+            <tr><th>File Name</th><th>Source URL</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>acme.sh</td><td><a href="https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh">https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh</a></td></tr>
 <tr><td>dnsproxy.sh</td><td><a href="https://raw.githubusercontent.com/woolflare/install.is/main/dnsproxy.sh">https://raw.githubusercontent.com/woolflare/install.is/main/dnsproxy.sh</a></td></tr>
 <tr><td>docker.sh</td><td><a href="https://raw.githubusercontent.com/docker/docker-install/master/install.sh">https://raw.githubusercontent.com/docker/docker-install/master/install.sh</a></td></tr>
 <tr><td>helm.sh</td><td><a href="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3">https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3</a></td></tr>
@@ -22,7 +31,8 @@
 <tr><td>speedtest.sh</td><td><a href="https://raw.githubusercontent.com/P3TERX/script/master/speedtest-cli.sh">https://raw.githubusercontent.com/P3TERX/script/master/speedtest-cli.sh</a></td></tr>
 <tr><td>v2ray.sh</td><td><a href="https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh">https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh</a></td></tr>
 <tr><td>yarn.sh</td><td><a href="https://raw.githubusercontent.com/yarnpkg/website/master/install.sh">https://raw.githubusercontent.com/yarnpkg/website/master/install.sh</a></td></tr>
+        </tbody>
     </table>
-    <p><a href="https://github.com/woolflare/install.is">Visit our GitHub repository</a></p>
+    <p>For more details, visit our <a href="https://github.com/woolflare/install.is">GitHub repository</a>.</p>
 </body>
 </html>
