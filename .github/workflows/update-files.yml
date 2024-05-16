@@ -1,0 +1,79 @@
+name: Update Files
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-files:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository content
+      uses: actions/checkout@v4
+
+    - name: Set up jq and GNU Parallel
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq parallel
+
+    - name: Configure git settings
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+
+    - name: Clean and pull latest changes
+      run: |
+        git reset --hard
+        git fetch origin
+        git rebase origin/main
+
+    - name: Update files from scripts.json
+      run: |
+        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value)"' scripts.json | parallel --gnu -j 4
+
+    - name: Generate HTML page
+      run: |
+        cat > index.html <<EOF
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>File List</title>
+        </head>
+        <body>
+            <h1>File List</h1>
+            <table border="1">
+                <tr><th>File Name</th><th>URL</th></tr>
+                $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><a href=\"\(.value)\">\(.value)</a></td></tr>"' scripts.json)
+            </table>
+            <p><a href="https://github.com/woolflare/install.is">Visit our GitHub repository</a></p>
+        </body>
+        </html>
+        EOF
+
+    - name: Commit and push HTML changes
+      run: |
+        if [ -n "$(git status --porcelain | grep index.html)" ]; then
+          git add index.html
+          git commit -m 'Regenerate HTML index page'
+          git push
+        else
+          echo "No changes to commit for index.html"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Commit and push script changes
+      run: |
+        if [ -n "$(git status --porcelain | grep '\.sh$')" ]; then
+          git add *.sh
+          git commit -m 'Update script files'
+          git push
+        else
+          echo "No changes to commit for script files"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
