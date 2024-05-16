@@ -41,15 +41,25 @@ jobs:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>File List</title>
+            <meta name="description" content="Automatic installation script collection.">
+            <title>Install Scripts - install.is</title>
         </head>
         <body>
-            <h1>File List</h1>
+            <h1>Usage</h1>
+            <p>To install a specific package using <code>install.is</code>, use the following <code>curl</code> command:</p>
+            <pre><code>curl -L install.is/[package_name] | bash</code></pre>
+            <p>Replace <code>[package_name]</code> with the name of the desired script. For example, to install <code>acme.sh</code>, you would use:</p>
+            <pre><code>curl -L install.is/acme.sh | bash</code></pre>
+            <h1>Available Scripts List</h1>
             <table border="1">
-                <tr><th>File Name</th><th>URL</th></tr>
-                $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><a href=\"\(.value)\">\(.value)</a></td></tr>"' scripts.json)
+                <thead>
+                    <tr><th>File Name</th><th>Source URL</th></tr>
+                </thead>
+                <tbody>
+                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><a href=\"\(.value)\">\(.value)</a></td></tr>"' scripts.json)
+                </tbody>
             </table>
-            <p><a href="https://github.com/woolflare/install.is">Visit our GitHub repository</a></p>
+            <p>For more details, visit our <a href="https://github.com/woolflare/install.is">GitHub repository</a>.</p>
         </body>
         </html>
         EOF
