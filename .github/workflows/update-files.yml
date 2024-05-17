@@ -53,10 +53,10 @@ jobs:
             <h1>Available Scripts List</h1>
             <table border="1">
                 <thead>
-                    <tr><th>File Name</th><th>Source URL</th></tr>
+                    <tr><th>File Name</th><th>Command</th><th>Source</th></tr>
                 </thead>
                 <tbody>
-                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><a href=\"\(.value)\">\(.value)</a></td></tr>"' scripts.json)
+                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td>curl -sS https://install.is/\(.key) \| bash</td><td><a href=\"\(.value)\">\>></a></td></tr>"' scripts.json)
                 </tbody>
             </table>
             <p>For more details, visit our <a href="https://github.com/woolflare/install.is">GitHub repository</a>.</p>
