@@ -7,6 +7,7 @@
     "homebrew.sh": "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh",
     "hysteria2.sh": "https://raw.githubusercontent.com/apernet/hysteria/master/scripts/install_server.sh",
     "ohmyzsh.sh": "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh",
+    "pyenv": "https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer",
     "rustup.sh": "https://raw.githubusercontent.com/rust-lang/rustup/master/rustup-init.sh",
     "rvm.sh": "https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer",
     "snell.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/snell.sh",
