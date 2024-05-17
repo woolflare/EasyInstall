@@ -14,7 +14,7 @@ CURRENT_IP=$(curl -s ip.plus/myip)
 
 # Check if IP has changed
 if [ -f "$IP_FILE" ]; then
-    OLD_IP=$(cat $IP_FILE)
+    OLD_IP=$(cat "$IP_FILE")
 else
     OLD_IP=""
 fi
@@ -51,9 +51,10 @@ if [ -z "$RECORD_ID" ]; then
 
     if echo "$CREATE_RESPONSE" | grep -q '"success":true'; then
         echo "DNS record created successfully."
-        echo $CURRENT_IP > $IP_FILE
+        echo "$CURRENT_IP" > "$IP_FILE"
     else
         echo "Error: Failed to create DNS record."
+        echo "Response: $CREATE_RESPONSE"
         exit 1
     fi
 else
@@ -66,9 +67,10 @@ else
 
     if echo "$UPDATE_RESPONSE" | grep -q '"success":true'; then
         echo "DNS record updated successfully."
-        echo $CURRENT_IP > $IP_FILE
+        echo "$CURRENT_IP" > "$IP_FILE"
     else
         echo "Error: Failed to update DNS record."
+        echo "Response: $UPDATE_RESPONSE"
         exit 1
     fi
 fi
