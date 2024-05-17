@@ -1,5 +1,6 @@
 {
     "acme.sh": "https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh",
+    "ddns_cf": "https://raw.githubusercontent.com/woolflare/install.is/main/ddns_cf.sh",
     "dnsproxy.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/dnsproxy.sh",
     "docker.sh": "https://raw.githubusercontent.com/docker/docker-install/master/install.sh",
     "helm.sh": "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3",
