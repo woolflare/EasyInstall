@@ -56,7 +56,7 @@ jobs:
                     <tr><th>File Name</th><th>Command</th><th>Source</th></tr>
                 </thead>
                 <tbody>
-                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td>curl -sS https://install.is/\(.key) | bash</td><td><a href=\"\(.value)\">\>></a></td></tr>"' scripts.json)
+                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td>curl -sS https://install.is/\(.key) | bash</td><td><a href=\"\(.value)\">&gt;&gt;</a></td></tr>"' scripts.json)
                 </tbody>
             </table>
             <p>For more details, visit our <a href="https://github.com/woolflare/install.is">GitHub repository</a>.</p>
