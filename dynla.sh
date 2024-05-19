@@ -151,12 +151,16 @@ while true; do
             echo "Usage Instructions:"
             echo "1. Update hostname without specifying IP address:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la\""
+            echo ""
             echo "2. Update hostname with a specified IP address:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=1.2.3.4\""
+            echo ""
             echo "3. Get current IP from 4.ip.plus and update hostname:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=\$(curl -s 4.ip.plus/myip)\""
+            echo ""
             echo "4. Get current IP from 6.ip.plus and update hostname:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=\$(curl -s 6.ip.plus/myip)\""
+            echo ""
             echo "POST Requests:"
             echo "1. Update hostname using POST method:"
             echo "   curl -X POST https://dns.dyn.la/update -d \"password=iz5aqj11p8mual4e\" -d \"hostname=test.dyn.la\""
@@ -172,3 +176,7 @@ while true; do
             ;;
     esac
 done
+else
+    echo "Invalid or expired login credentials."
+    echo  "Unset login credentials with 'unset DYNLA' and try again."
+fi
