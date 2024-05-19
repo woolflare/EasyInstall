@@ -72,10 +72,16 @@ while [ -z "$token" ]; do
     fi
 done
 
-HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" "https://beta.dyn.la/oauth/callback?provider=github" -H "Authorization: Bearer $token")
 
-if [ "$HTTP_STATUS" -eq 200 ]; then
-    login_token=$(curl -fsSL "https://beta.dyn.la/oauth/callback?provider=github" -H "Authorization: Bearer $token")
+login_response=$(curl -s "https://beta.dyn.la/oauth/callback?provider=github" \
+-H "Authorization: Bearer $token")
+
+login_token=$(echo "$login_response" | grep -o '"token":"[^"]*"' | sed -e 's/^"token":"//' -e 's/"$//')
+username=$(echo "$login_response" | grep -o '"username":"[^"]*"' | sed -e 's/^"username":"//' -e 's/"$//')
+login_error=$(echo "$login_response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
+
+if [ "$login_token" ]; then
+echo "Login successful!"
 echo "
 ______   __   __  __    _        ___      _______ 
 |      | |  | |  ||  |  | |      |   |    |   _   |
@@ -85,7 +91,9 @@ ______   __   __  __    _        ___      _______
 |       |  |   |  | | |   ||   | |       ||   _   |
 |______|   |___|  |_|  |__||___| |_______||__| |__|
 "
-echo "Login successful!"
+echo ""
+echo "Welcome $username"
+echo "-----------------"
 
 if [ -z "$DYNLA" ]; then
     echo ""
@@ -95,18 +103,23 @@ if [ -z "$DYNLA" ]; then
 fi
 
 while true; do
+    echo ""
     echo "Choose an option:"
+    echo ""
     echo "n - Create new dynamic DNS"
     echo "d - Delete dynamic DNS"
     echo "r - Reset dynamic DNS"
     echo "l - List all dynamic DNS"
     echo "e - Exit"
     echo "h - Display help"
+    echo ""
     read -p "Enter option code: " option
+    echo ""
 
     case "$option" in
         n)
             read -p "Enter hostname e.g test.dyn.la: " hostname
+            echo ""
             case "$hostname" in
                 *.dyn.la) ;;
                 *) hostname="${hostname}.dyn.la"
@@ -114,11 +127,13 @@ while true; do
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
             -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
-            echo "$response"
+            echo "-> $response"
+            echo ""
             read -p "Press enter to continue..."
             ;;
         d)
             read -p "Enter hostname e.g test.dyn.la: " hostname
+            echo ""
             case "$hostname" in
                 *.dyn.la) ;;
                 *) hostname="${hostname}.dyn.la"
@@ -126,11 +141,13 @@ while true; do
             response=$(curl -s -X POST "https://beta.dyn.la/delete" \
             -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
-            echo "$response"
+            echo "-> $response"
+            echo ""
             read -p "Press enter to continue..."
             ;;
         r)
             read -p "Enter hostname e.g test.dyn.la: " hostname
+            echo ""
             case "$hostname" in
                 *.dyn.la) ;;
                 *) hostname="${hostname}.dyn.la"
@@ -138,13 +155,15 @@ while true; do
             response=$(curl -s -X POST "https://beta.dyn.la/reset" \
             -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
-            echo "$response"
+            echo "-> $response"
+            echo ""
             read -p "Press enter to continue..."
             ;;
         l)
             response=$(curl -s -X POST "https://beta.dyn.la/list" \
             -H "Authorization: Bearer $login_token")
-            echo "$response"
+            echo "-> $response"
+            echo ""
             read -p "Press enter to continue..."
             ;;
         h)
@@ -164,19 +183,24 @@ while true; do
             echo "POST Requests:"
             echo "1. Update hostname using POST method:"
             echo "   curl -X POST https://dns.dyn.la/update -d \"password=iz5aqj11p8mual4e\" -d \"hostname=test.dyn.la\""
+            echo ""
             read -p "Press enter to continue..."
             ;;
         e)
-            echo "Exiting."
+            echo "-> Exiting."
             break
             ;;
         *)
-            echo "Undefined option."
-            read -p "Press enter to continue..."
+            echo "-> Undefined option."
             ;;
     esac
 done
 else
-    echo "Invalid or expired login credentials."
-    echo  "Unset login credentials with 'unset DYNLA' and try again."
+    echo ""
+    echo "Error"
+    echo ""
+    echo "-> $login_error"
+    echo ""
+    echo "This might be caused by invalid or expired login credentials."
+    echo "If environment variables are set, unset login credentials with 'unset DYNLA' and try again."
 fi
