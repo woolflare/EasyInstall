@@ -74,7 +74,7 @@ while true; do
     case "$option" in
         n)
             read -p "Enter hostname e.g test.dyn.la: " hostname
-            if [ "${hostname##*.}" != "dyn.la" ]; then
+            if [ "${hostname%.dyn.la}" = "$hostname" ]; then
                 hostname="${hostname}.dyn.la"
             fi
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
@@ -84,9 +84,9 @@ while true; do
             ;;
         d)
             read -p "Enter hostname e.g test.dyn.la: " hostname
-            if [ "${hostname##*.}" != "dyn.la" ]; then
+            if [ "${hostname%.dyn.la}" = "$hostname" ]; then
                 hostname="${hostname}.dyn.la"
-            fi            
+            fi
             response=$(curl -s -X POST "https://beta.dyn.la/delete" \
             -H "Authorization: Bearer $token" \
             -d "hostname=$hostname")
@@ -94,9 +94,9 @@ while true; do
             ;;
         r)
             read -p "Enter hostname e.g test.dyn.la: " hostname
-            if [ "${hostname##*.}" != "dyn.la" ]; then
+            if [ "${hostname%.dyn.la}" = "$hostname" ]; then
                 hostname="${hostname}.dyn.la"
-            fi            
+            fi
             response=$(curl -s -X POST "https://beta.dyn.la/reset" \
             -H "Authorization: Bearer $token" \
             -d "hostname=$hostname")
