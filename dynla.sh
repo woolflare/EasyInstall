@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -t 1 ]; then
+if [ -t 0 ]; then
     echo "Running in interactive mode."
 else
     echo "This script is not running in an interactive mode."
