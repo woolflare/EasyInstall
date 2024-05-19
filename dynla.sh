@@ -2,8 +2,7 @@
 
 response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/device/code" \
 -H "Accept: application/json" \
--d "client_id=Ov23lixTcMeZpkmqNiWJ" \
--d "scope=user,repo")
+-d "client_id=Ov23lixTcMeZpkmqNiWJ")
 
 device_code=$(echo $response | grep -o '"device_code":"[^"]*"' | sed -e 's/^"device_code":"//' -e 's/"$//')
 user_code=$(echo $response | grep -o '"user_code":"[^"]*"' | sed -e 's/^"user_code":"//' -e 's/"$//')
