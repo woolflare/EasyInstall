@@ -3,9 +3,9 @@
 if [ -t 0 ]; then
     echo "Running in interactive mode."
 else
-    echo ""
+    echo "----------------------------------------------------"
     echo "This script is not running in an interactive mode."
-    echo ""
+    echo "----------------------------------------------------"
     echo "Please download the script and run it locally for interactive features."
     echo "Use the following commands to download and run the script:"
     echo ""
