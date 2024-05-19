@@ -1,36 +1,30 @@
 #!/bin/sh
 
-response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/device/code" \
--H "Accept: application/json" \
--d "client_id=Ov23lixTcMeZpkmqNiWJ")
+token=${DYNLA:-}
 
-device_code=$(echo "$response" | grep -o '"device_code":"[^"]*"' | sed -e 's/^"device_code":"//' -e 's/"$//')
-user_code=$(echo "$response" | grep -o '"user_code":"[^"]*"' | sed -e 's/^"user_code":"//' -e 's/"$//')
-verification_uri=$(echo "$response" | grep -o '"verification_uri":"[^"]*"' | sed -e 's/^"verification_uri":"//' -e 's/"$//')
-expires_in=$(echo "$response" | grep -o '"expires_in":[0-9]*' | sed -e 's/^"expires_in"://')
-interval=$(echo "$response" | grep -o '"interval":[0-9]*' | sed -e 's/^"interval"://')
+if [ -z "$token" ]; then
+    response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/device/code" \
+    -H "Accept: application/json" \
+    -d "client_id=Ov23lixTcMeZpkmqNiWJ")
 
-echo "
- ______   __   __  __    _        ___      _______ 
-|      | |  | |  ||  |  | |      |   |    |   _   |
-|  _    ||  |_|  ||   |_| |      |   |    |  |_|  |
-| | |   ||       ||       |      |   |    |       |
-| |_|   ||_     _||  _    | ___  |   |___ |       |
-|       |  |   |  | | |   ||   | |       ||   _   |
-|______|   |___|  |_|  |__||___| |_______||__| |__|
-"
-echo "Open the following URL in your browser"
-echo ""
-echo "$verification_uri"
-echo ""
-echo "and enter the user code"
-echo ""
-echo "$user_code"
-echo ""
-echo "to complete the login."
+    device_code=$(echo "$response" | grep -o '"device_code":"[^"]*"' | sed -e 's/^"device_code":"//' -e 's/"$//')
+    user_code=$(echo "$response" | grep -o '"user_code":"[^"]*"' | sed -e 's/^"user_code":"//' -e 's/"$//')
+    verification_uri=$(echo "$response" | grep -o '"verification_uri":"[^"]*"' | sed -e 's/^"verification_uri":"//' -e 's/"$//')
+    expires_in=$(echo "$response" | grep -o '"expires_in":[0-9]*' | sed -e 's/^"expires_in"://')
+    interval=$(echo "$response" | grep -o '"interval":[0-9]*' | sed -e 's/^"interval"://')
 
-echo "Waiting for user to complete login..."
+    echo "Open the following URL in your browser"
+    echo ""
+    echo "$verification_uri"
+    echo ""
+    echo "and enter the user code"
+    echo ""
+    echo "$user_code"
+    echo ""
+    echo "to complete the login."
 
+    echo "Waiting for user to complete login..."
+fi
 while [ -z "$token" ]; do
     sleep "$interval"
     token_response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/oauth/access_token" \
@@ -58,17 +52,30 @@ while [ -z "$token" ]; do
     fi
 done
 
-echo "Login successful"
-echo "========"
+echo "
+______   __   __  __    _        ___      _______ 
+|      | |  | |  ||  |  | |      |   |    |   _   |
+|  _    ||  |_|  ||   |_| |      |   |    |  |_|  |
+| | |   ||       ||       |      |   |    |       |
+| |_|   ||_     _||  _    | ___  |   |___ |       |
+|       |  |   |  | | |   ||   | |       ||   _   |
+|______|   |___|  |_|  |__||___| |_______||__| |__|
+"
+echo "Login successful!"
+
+if [ -z "$token" ]; then
+    echo "Use this command to set an environment variable for login persistence"
+    echo "export DYNLA=$token"
+fi
 
 while true; do
     echo "Choose an option:"
-    echo "n - /New"
-    echo "d - /Delete"
-    echo "r - /Reset"
-    echo "l - /List"
-    echo "e - /Exit"
-    echo "h - /Usage"
+    echo "n - Create new dynamic DNS"
+    echo "d - Delete dynamic DNS"
+    echo "r - Reset dynamic DNS"
+    echo "l - List all dynamic DNS"
+    echo "e - Exit"
+    echo "h - Display help"
     read -p "Enter option code: " option
 
     case "$option" in
