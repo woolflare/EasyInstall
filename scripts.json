@@ -3,6 +3,7 @@
     "ddns_cf.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/ddns_cf.sh",
     "dnsproxy.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/dnsproxy.sh",
     "docker.sh": "https://raw.githubusercontent.com/docker/docker-install/master/install.sh",
+    "dynla.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/dynla.sh",
     "helm.sh": "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3",
     "homebrew.sh": "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh",
     "hysteria2.sh": "https://raw.githubusercontent.com/apernet/hysteria/master/scripts/install_server.sh",
