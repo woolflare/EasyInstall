@@ -52,6 +52,10 @@ while [ -z "$token" ]; do
     fi
 done
 
+HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" "https://beta.dyn.la/oauth/callback?provider=github" -H "Authorization: Bearer $token")
+
+if [ "$HTTP_STATUS" -eq 200 ]; then
+    login_token=$(curl -fsSL "https://beta.dyn.la/oauth/callback?provider=github" -H "Authorization: Bearer $token")
 echo "
 ______   __   __  __    _        ___      _______ 
 |      | |  | |  ||  |  | |      |   |    |   _   |
@@ -63,9 +67,11 @@ ______   __   __  __    _        ___      _______
 "
 echo "Login successful!"
 
-if [ -z "$token" ]; then
+if [ -z "$DYNLA" ]; then
+    echo ""
     echo "Use this command to set an environment variable for login persistence"
     echo "export DYNLA=$token"
+    echo ""
 fi
 
 while true; do
@@ -86,7 +92,7 @@ while true; do
                 *) hostname="${hostname}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
-            -H "Authorization: Bearer $token" \
+            -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
             echo "$response"
             ;;
@@ -97,7 +103,7 @@ while true; do
                 *) hostname="${hostname}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/delete" \
-            -H "Authorization: Bearer $token" \
+            -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
             echo "$response"
             ;;
@@ -108,13 +114,13 @@ while true; do
                 *) hostname="${hostname}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/reset" \
-            -H "Authorization: Bearer $token" \
+            -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
             echo "$response"
             ;;
         l)
             response=$(curl -s -X POST "https://beta.dyn.la/list" \
-            -H "Authorization: Bearer $token")
+            -H "Authorization: Bearer $login_token")
             echo "$response"
             ;;
         h)
@@ -145,3 +151,7 @@ while true; do
             ;;
     esac
 done
+else
+    echo "Invalid or expired login credentials."
+    echo  "Unset login credentials with 'unset DYNLA' and try again."
+fi
