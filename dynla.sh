@@ -3,15 +3,21 @@
 if [ -t 0 ]; then
     echo "Running in interactive mode."
 else
+    echo ""
     echo "This script is not running in an interactive mode."
+    echo ""
     echo "Please download the script and run it locally for interactive features."
     echo "Use the following commands to download and run the script:"
+    echo ""
     echo "  curl -O https://install.is/dynla.sh"
     echo "  chmod +x dynla.sh"
     echo "  ./dynla.sh"
+    echo ""
     echo "Or run it directly in an interactive shell:"
+    echo ""
     echo "  sh -c \"\$(curl -fsSL https://install.is/dynla.sh)\""
-    exit 1
+    echo ""
+    exit 1 
 fi
 
 token=${DYNLA:-}
