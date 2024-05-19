@@ -115,6 +115,7 @@ while true; do
             -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
             echo "$response"
+            read -p "Press enter to continue..."
             ;;
         d)
             read -p "Enter hostname e.g test.dyn.la: " hostname
@@ -126,6 +127,7 @@ while true; do
             -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
             echo "$response"
+            read -p "Press enter to continue..."
             ;;
         r)
             read -p "Enter hostname e.g test.dyn.la: " hostname
@@ -137,30 +139,28 @@ while true; do
             -H "Authorization: Bearer $login_token" \
             -d "hostname=$hostname")
             echo "$response"
+            read -p "Press enter to continue..."
             ;;
         l)
             response=$(curl -s -X POST "https://beta.dyn.la/list" \
             -H "Authorization: Bearer $login_token")
             echo "$response"
+            read -p "Press enter to continue..."
             ;;
         h)
             echo "Usage Instructions:"
             echo "1. Update hostname without specifying IP address:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la\""
-            echo ""
             echo "2. Update hostname with a specified IP address:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=1.2.3.4\""
-            echo ""
             echo "3. Get current IP from 4.ip.plus and update hostname:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=\$(curl -s 4.ip.plus/myip)\""
-            echo ""
             echo "4. Get current IP from 6.ip.plus and update hostname:"
             echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=\$(curl -s 6.ip.plus/myip)\""
-            echo ""
             echo "POST Requests:"
             echo "1. Update hostname using POST method:"
             echo "   curl -X POST https://dns.dyn.la/update -d \"password=iz5aqj11p8mual4e\" -d \"hostname=test.dyn.la\""
-            echo "   (Default TTL is 1 minute)"
+            read -p "Press enter to continue..."
             ;;
         e)
             echo "Exiting."
@@ -168,10 +168,7 @@ while true; do
             ;;
         *)
             echo "Undefined option."
+            read -p "Press enter to continue..."
             ;;
     esac
 done
-else
-    echo "Invalid or expired login credentials."
-    echo  "Unset login credentials with 'unset DYNLA' and try again."
-fi
