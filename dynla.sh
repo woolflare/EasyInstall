@@ -126,7 +126,7 @@ while true; do
     echo "${tty_green}r${tty_reset} - Reset dynamic DNS password"
     echo "${tty_green}l${tty_reset} - List all dynamic DNS"
     echo "${tty_green}s${tty_reset} - Show hostname IP history"
-    echo "${tty_green}e${tty_reset} - Exit"
+    echo "${tty_green}q${tty_reset} - Quit"
     echo "${tty_green}h${tty_reset} - Display help"
     echo ""
     read -p "Enter option code: " option
@@ -226,7 +226,7 @@ while true; do
             echo ""
             # read -p "Press enter to continue..."
             ;;
-        e)
+        q)
             echo "${tty_blue}->${tty_reset} Exiting."
             break
             ;;
