@@ -125,6 +125,7 @@ while true; do
     echo "${tty_green}d${tty_reset} - Delete dynamic DNS"
     echo "${tty_green}r${tty_reset} - Reset dynamic DNS password"
     echo "${tty_green}l${tty_reset} - List all dynamic DNS"
+    echo "${tty_green}s${tty_reset} - Show hostname IP history"
     echo "${tty_green}e${tty_reset} - Exit"
     echo "${tty_green}h${tty_reset} - Display help"
     echo ""
@@ -185,6 +186,22 @@ while true; do
             echo ""
             response=$(curl -s -X POST "https://beta.dyn.la/list" \
             -H "Authorization: Bearer $login_token")
+            echo "${tty_blue}->${tty_reset} $response"
+            echo ""
+            # read -p "Press enter to continue..."
+            ;;
+        s)
+            echo "[Show hostname IP history]"
+            echo ""
+            read -p "Enter hostname e.g test.dyn.la: " hostname
+            echo ""
+            case "$hostname" in
+                *.dyn.la) ;;
+                *) hostname="${hostname}.dyn.la"
+            esac
+            response=$(curl -s -X POST "https://beta.dyn.la/log" \
+            -H "Authorization: Bearer $login_token" \
+            -d "hostname=$hostname")
             echo "${tty_blue}->${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
