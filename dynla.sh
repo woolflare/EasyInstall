@@ -172,7 +172,7 @@ while true; do
             re_domain=$(echo "$response" | cut -d ' ' -f2)
             re_password=$(echo "$response" | cut -d ' ' -f3)
 
-            if [[ $re_status == "ok" ]]; then 
+            if [ "$re_status" = "ok" ]; then
                 echo "Use the following link to update your DDNS:"
                 echo ""
                 echo "curl \"https://dns.dyn.la/update?password=${re_password}&domain=${re_domain}\""
