@@ -89,7 +89,7 @@ while [ -z "$token" ]; do
     fi
 done
 
-
+echo "Logging in..." 
 login_response=$(curl -s "https://beta.dyn.la/oauth/callback?provider=github" \
 -H "Authorization: Bearer $token")
 login_token=$(echo "$login_response" | grep -o '"token":"[^"]*"' | sed -e 's/^"token":"//' -e 's/"$//')
