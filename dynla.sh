@@ -1,6 +1,8 @@
 #!/bin/sh
 
-if [[ -t 1 ]]
+set -u
+
+if [ -t 1 ]
 then
   tty_escape() { printf "\033[%sm" "$1"; }
 else
