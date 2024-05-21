@@ -125,7 +125,7 @@ while true; do
     echo "${tty_green}d${tty_reset} - Delete dynamic DNS"
     echo "${tty_green}r${tty_reset} - Reset dynamic DNS password"
     echo "${tty_green}l${tty_reset} - List all dynamic DNS"
-    echo "${tty_green}s${tty_reset} - Show hostname IP history"
+    echo "${tty_green}s${tty_reset} - Show domain IP history"
     echo "${tty_green}q${tty_reset} - Quit"
     echo "${tty_green}h${tty_reset} - Display help"
     echo ""
@@ -136,15 +136,15 @@ while true; do
         n)
             echo "[Creatie new dynamic DNS]"
             echo ""
-            read -p "Enter hostname e.g test.dyn.la: " hostname
+            read -p "${tty_green}Creatie domain:${tty_reset} " domain
             echo ""
-            case "$hostname" in
+            case "$domain" in
                 *.dyn.la) ;;
-                *) hostname="${hostname}.dyn.la"
+                *) domain="${domain}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
             -H "Authorization: Bearer $login_token" \
-            -d "hostname=$hostname")
+            -d "domain=$domain")
             echo "${tty_blue}->${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
@@ -152,15 +152,15 @@ while true; do
         d)
             echo "${tty_red}[Delete dynamic DNS]${tty_reset}"
             echo ""
-            read -p "Enter hostname e.g test.dyn.la: " hostname
+            read -p "${tty_red}Delete domain:${tty_reset} " domain
             echo ""
-            case "$hostname" in
+            case "$domain" in
                 *.dyn.la) ;;
-                *) hostname="${hostname}.dyn.la"
+                *) domain="${domain}.dyn.la"
             esac
-            response=$(curl -s -X POST "https://beta.dyn.la/delete" \
+            response=$(curl -s -X GET "https://beta.dyn.la/delete" \
             -H "Authorization: Bearer $login_token" \
-            -d "hostname=$hostname")
+            -d "domain=$domain")
             echo "${tty_blue}->${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
@@ -168,15 +168,15 @@ while true; do
         r)
             echo "[Reset dynamic DNS password]"
             echo ""
-            read -p "Enter hostname e.g test.dyn.la: " hostname
+            read -p "${tty_green}Reset domain password:${tty_reset} " domain
             echo ""
-            case "$hostname" in
+            case "$domain" in
                 *.dyn.la) ;;
-                *) hostname="${hostname}.dyn.la"
+                *) domain="${domain}.dyn.la"
             esac
-            response=$(curl -s -X POST "https://beta.dyn.la/reset" \
+            response=$(curl -s -X GET "https://beta.dyn.la/reset" \
             -H "Authorization: Bearer $login_token" \
-            -d "hostname=$hostname")
+            -d "domain=$domain")
             echo "${tty_blue}->${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
@@ -184,45 +184,47 @@ while true; do
         l)
             echo "[List all dynamic DNS]"
             echo ""
-            response=$(curl -s -X POST "https://beta.dyn.la/list" \
+            response=$(curl -s -X GET "https://beta.dyn.la/list" \
             -H "Authorization: Bearer $login_token")
             echo "${tty_blue}->${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
             ;;
         s)
-            echo "[Show hostname IP history]"
+            echo "[Show domain IP history]"
             echo ""
-            read -p "Enter hostname e.g test.dyn.la: " hostname
+            read -p "${tty_green}Show domain history:${tty_reset} " domain
             echo ""
-            case "$hostname" in
+            case "$domain" in
                 *.dyn.la) ;;
-                *) hostname="${hostname}.dyn.la"
+                *) domain="${domain}.dyn.la"
             esac
-            response=$(curl -s -X POST "https://beta.dyn.la/log" \
+            response=$(curl -s -X GET "https://beta.dyn.la/log" \
             -H "Authorization: Bearer $login_token" \
-            -d "hostname=$hostname")
+            -d "domain=$domain")
             echo "${tty_blue}->${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
             ;;
         h)
             echo "Usage Instructions:"
-            echo "1. Update hostname without specifying IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la\""
+            echo "1. Update domain without specifying IP address:"
+            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la\""
             echo ""
-            echo "2. Update hostname with a specified IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=1.2.3.4\""
+            echo "2. Update domain with a specified IP address:"
+            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&myip=1.2.3.4\""
             echo ""
-            echo "3. Get current IP from 4.ip.plus and update hostname:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=\$(curl -s 4.ip.plus/myip)\""
+            echo "3. Get current IP from 4.ip.plus and update domain:"
+            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&myip=\$(curl -s 4.ip.plus/myip)\""
             echo ""
-            echo "4. Get current IP from 6.ip.plus and update hostname:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&hostname=test.dyn.la&myip=\$(curl -s 6.ip.plus/myip)\""
+            echo "4. Get current IP from 6.ip.plus and update domain:"
+            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&myip=\$(curl -s 6.ip.plus/myip)\""
             echo ""
+            echo "5. Add TXT record:"
+            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&txt=sometext\""
             echo "POST Requests:"
-            echo "1. Update hostname using POST method:"
-            echo "   curl -X POST https://dns.dyn.la/update -d \"password=iz5aqj11p8mual4e\" -d \"hostname=test.dyn.la\""
+            echo "1. Update domain using POST method:"
+            echo "   curl -X POST https://dns.dyn.la/update -d \"password=iz5aqj11p8mual4e\" -d \"domain=test.dyn.la\""
             echo ""
             # read -p "Press enter to continue..."
             ;;
