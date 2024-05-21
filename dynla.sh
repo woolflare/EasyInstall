@@ -37,7 +37,18 @@ else
     exit 1 
 fi
 
-token=${DYNLA:-}
+login_credential=${DYNLA:-}
+
+if [ -z "$login_credential" ]; then
+    if [ -f ".dynla" ]; then
+        login_credential=$(cat .dynla)
+        echo "Login credential loaded from .dynla file."
+    else
+        echo "No login credential found. You may need to login."
+    fi
+fi
+
+token=$login_credential
 
 if [ -z "$token" ]; then
     response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/device/code" \
@@ -88,6 +99,17 @@ while [ -z "$token" ]; do
         echo "No valid access token obtained, continuing to try..."
     fi
 done
+echo "Authorization successful!"
+if [ -z "$login_credential" ]; then
+    read -p "Do you want to save the login credential to the current directory? (y/n): " save_creds
+    if [[ $save_creds == "y" || $save_creds == "Y" ]]; then
+        echo $token > .dynla
+        echo "Login credential saved to .dynla file."
+    else
+        echo "You can use export command to set an environment variable for login persistence"
+        echo "${tty_blue}export DYNLA=$token${tty_reset}"
+    fi
+fi
 
 echo "Logging in..." 
 login_response=$(curl -s "https://beta.dyn.la/oauth/callback?provider=github" \
@@ -112,20 +134,14 @@ echo "Welcome $username"
 echo "-----------------"
 echo ""
 
-if [ -z "$DYNLA" ]; then
-    echo "Use this command to set an environment variable for login persistence"
-    echo "${tty_blue}export DYNLA=$token${tty_reset}"
-    echo ""
-fi
-
 while true; do
     echo "Choose an option:"
     echo ""
-    echo "${tty_green}n${tty_reset} - Create new dynamic DNS"
-    echo "${tty_green}d${tty_reset} - Delete dynamic DNS"
-    echo "${tty_green}r${tty_reset} - Reset dynamic DNS password"
-    echo "${tty_green}l${tty_reset} - List all dynamic DNS"
-    echo "${tty_green}s${tty_reset} - Show domain IP history"
+    echo "${tty_green}c${tty_reset} - Create a new DDNS"
+    echo "${tty_green}d${tty_reset} - Delete DDNS"
+    echo "${tty_green}r${tty_reset} - Reset DDNS password"
+    echo "${tty_green}l${tty_reset} - List all DDNS domains"
+    echo "${tty_green}s${tty_reset} - Show DDNS IP history"
     echo "${tty_green}q${tty_reset} - Quit"
     echo "${tty_green}h${tty_reset} - Display help"
     echo ""
@@ -133,10 +149,12 @@ while true; do
     echo ""
 
     case "$option" in
-        n)
-            echo "[Creatie new dynamic DNS]"
+        c)
+            echo "[Creatie a new DDNS]"
             echo ""
-            read -p "${tty_green}Creatie domain:${tty_reset} " domain
+            echo "Enter domain, e.g., test.dyn.la:"
+            echo ""
+            read -p "${tty_blue}<<${tty_reset} " domain
             echo ""
             case "$domain" in
                 *.dyn.la) ;;
@@ -145,14 +163,29 @@ while true; do
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
             -H "Authorization: Bearer $login_token" \
             -d "domain=$domain")
-            echo "${tty_blue}->${tty_reset} $response"
+            echo "${tty_green}>>${tty_reset} $response"
             echo ""
+
+            re_status=$(echo "$response" | cut -d ' ' -f1)
+            re_domain=$(echo "$response" | cut -d ' ' -f2)
+            re_password=$(echo "$response" | cut -d ' ' -f3)
+
+            if [[ $re_status == "ok" ]]; then 
+                echo "Use the following link to update your DDNS:"
+                echo ""
+                echo "curl \"https://dns.dyn.la/update?password=${re_password}&domain=${re_domain}\""
+                echo ""
+                echo "For more usage, refer to the help with ${tty_green}h${tty_reset}"
+                echo ""
+            fi
             # read -p "Press enter to continue..."
             ;;
         d)
-            echo "${tty_red}[Delete dynamic DNS]${tty_reset}"
+            echo "${tty_red}[Delete DDNS]${tty_reset}"
             echo ""
-            read -p "${tty_red}Delete domain:${tty_reset} " domain
+            echo "Enter domain to delete, e.g., test.dyn.la:"
+            echo ""
+            read -p "${tty_red}<<${tty_reset} " domain
             echo ""
             case "$domain" in
                 *.dyn.la) ;;
@@ -161,14 +194,16 @@ while true; do
             response=$(curl -s -X GET "https://beta.dyn.la/delete" \
             -H "Authorization: Bearer $login_token" \
             -d "domain=$domain")
-            echo "${tty_blue}->${tty_reset} $response"
+            echo "${tty_green}>>${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
             ;;
         r)
-            echo "[Reset dynamic DNS password]"
+            echo "[Reset DDNS password]"
             echo ""
-            read -p "${tty_green}Reset domain password:${tty_reset} " domain
+            echo "Enter domain for password reset, e.g., test.dyn.la:"
+            echo ""
+            read -p "${tty_blue}<<${tty_reset} " domain
             echo ""
             case "$domain" in
                 *.dyn.la) ;;
@@ -177,23 +212,27 @@ while true; do
             response=$(curl -s -X GET "https://beta.dyn.la/reset" \
             -H "Authorization: Bearer $login_token" \
             -d "domain=$domain")
-            echo "${tty_blue}->${tty_reset} $response"
+            echo "${tty_green}>>${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
             ;;
         l)
-            echo "[List all dynamic DNS]"
+            echo "[List all DDNS]"
             echo ""
             response=$(curl -s -X GET "https://beta.dyn.la/list" \
             -H "Authorization: Bearer $login_token")
-            echo "${tty_blue}->${tty_reset} $response"
+            echo "${tty_blue}<<${tty_reset} list"
+            echo ""
+            echo "${tty_green}>>${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
             ;;
         s)
-            echo "[Show domain IP history]"
+            echo "[Show DDNS IP history]"
             echo ""
-            read -p "${tty_green}Show domain history:${tty_reset} " domain
+            echo "Enter domain, e.g., test.dyn.la:"
+            echo ""
+            read -p "${tty_blue}<<${tty_reset} " domain
             echo ""
             case "$domain" in
                 *.dyn.la) ;;
@@ -202,38 +241,49 @@ while true; do
             response=$(curl -s -X GET "https://beta.dyn.la/log" \
             -H "Authorization: Bearer $login_token" \
             -d "domain=$domain")
-            echo "${tty_blue}->${tty_reset} $response"
+            echo "${tty_green}>>${tty_reset} $response"
             echo ""
             # read -p "Press enter to continue..."
             ;;
         h)
+            echo "${tty_blue}<<${tty_reset} help"
+            echo ""
+            echo "${tty_green}>>${tty_reset}"
             echo "Usage Instructions:"
-            echo "1. Update domain without specifying IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la\""
+            echo "-  Update domain without specifying IP address:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]\""
             echo ""
-            echo "2. Update domain with a specified IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&myip=1.2.3.4\""
+            echo "-  Update domain with a specified IP address:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=1.2.3.4\""
             echo ""
-            echo "3. Get current IP from 4.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&myip=\$(curl -s 4.ip.plus/myip)\""
+            echo "-  Get current IP from 4.ip.plus and update domain:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 4.ip.plus/myip)\""
             echo ""
-            echo "4. Get current IP from 6.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&myip=\$(curl -s 6.ip.plus/myip)\""
+            echo "-  Get current IP from 6.ip.plus and update domain:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 6.ip.plus/myip)\""
             echo ""
-            echo "5. Add TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=iz5aqj11p8mual4e&domain=test.dyn.la&txt=sometext\""
             echo "POST Requests:"
-            echo "1. Update domain using POST method:"
-            echo "   curl -X POST https://dns.dyn.la/update -d \"password=iz5aqj11p8mual4e\" -d \"domain=test.dyn.la\""
+            echo "-  Update domain using POST method:"
+            echo "   curl -X POST https://dns.dyn.la/update -d \"password=[YOURPASSWORD]\" -d \"domain=[YOURDOMAIN]\""
+            echo ""
+            echo "TXT Record:"
+            echo "-  Add a TXT record:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=sometext\""
+            echo ""
+            echo "-  Delete a TXT record:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=clear\""
             echo ""
             # read -p "Press enter to continue..."
             ;;
         q)
-            echo "${tty_blue}->${tty_reset} Exiting."
+            echo "${tty_blue}<<${tty_reset} quit"
+            echo ""
+            echo "${tty_green}>>${tty_reset} Quit."
             break
             ;;
         *)
-            echo "${tty_blue}->${tty_reset} Undefined option."
+            echo "${tty_green}>>${tty_reset} Undefined option."
+            echo ""
             ;;
     esac
 done
@@ -241,8 +291,8 @@ else
     echo ""
     echo "${tty_red}Error${tty_reset}"
     echo ""
-    echo "${tty_blue}->${tty_reset} $login_error"
+    echo "${tty_green}>>${tty_reset} $login_error"
     echo ""
     echo "This might be caused by invalid or expired login credentials."
-    echo "If environment variables are set, unset login credentials with 'unset DYNLA' and try again."
+    echo "Remove login credentials with 'unset DYNLA' or 'rm ./.dynla' and try again."
 fi
