@@ -104,7 +104,7 @@ done
 echo "Authorization successful!"
 if [ -z "$login_credential" ]; then
     read -p "Do you want to save the login credential to the current directory? (y/n): " save_creds
-    if [[ $save_creds == "y" || $save_creds == "Y" ]]; then
+    if [ "$save_creds" = "y" ] || [ "$save_creds" = "Y" ]; then
         echo $token > .dynla
         echo "Login credential saved to .dynla file."
     else
@@ -253,27 +253,27 @@ while true; do
             echo "${tty_green}>>${tty_reset}"
             echo "Usage Instructions:"
             echo "-  Update domain without specifying IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]\""
+            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN\""
             echo ""
             echo "-  Update domain with a specified IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=1.2.3.4\""
+            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&myip=1.2.3.4\""
             echo ""
             echo "-  Get current IP from 4.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 4.ip.plus/myip)\""
+            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&myip=\$(curl -s 4.ip.plus/myip)\""
             echo ""
             echo "-  Get current IP from 6.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 6.ip.plus/myip)\""
+            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&myip=\$(curl -s 6.ip.plus/myip)\""
             echo ""
             echo "POST Requests:"
             echo "-  Update domain using POST method:"
-            echo "   curl -X POST https://dns.dyn.la/update -d \"password=[YOURPASSWORD]\" -d \"domain=[YOURDOMAIN]\""
+            echo "   curl -X POST https://dns.dyn.la/update -d \"password=YOURPASSWORD\" -d \"domain=YOURDOMAIN\""
             echo ""
             echo "TXT Record:"
             echo "-  Add a TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=sometext\""
+            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&txt=sometext\""
             echo ""
             echo "-  Delete a TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=clear\""
+            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&txt=clear\""
             echo ""
             # read -p "Press enter to continue..."
             ;;
