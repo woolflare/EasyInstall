@@ -163,9 +163,9 @@ while true; do
                 *) input="${input}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
-            -H "Authorization: Bearer $login_token" \
-            -d "domain=$input")
-
+                            -H "Authorization: Bearer $login_token" \
+                            -H "Content-Type: application/json" \
+                            -d "{\"domain\":\"$input\"}")
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             domain=$(echo "$response" | grep -o '"domain":"[^"]*"' | sed -e 's/^"domain":"//' -e 's/"$//')
             password=$(echo "$response" | grep -o '"password":"[^"]*"' | sed -e 's/^"password":"//' -e 's/"$//')
@@ -197,14 +197,15 @@ while true; do
                 *) input="${input}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/delete" \
-            -H "Authorization: Bearer $login_token" \
-            -d "domain=$input")
+                            -H "Authorization: Bearer $login_token" \
+                            -H "Content-Type: application/json" \
+                            -d "{\"domain\":\"$input\"}")
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             if [ "$error" != "" ]; then
                 echo "${tty_green}>>${tty_reset} Error: $error"
                 echo ""
             else
-                echo "${tty_green}>>${tty_reset} Deleted domain $input"
+                echo "${tty_green}>>${tty_reset} Deleted domain: $input"
                 echo ""
             fi
             # read -p "Press enter to continue..."
@@ -221,8 +222,9 @@ while true; do
                 *) input="${input}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/reset" \
-            -H "Authorization: Bearer $login_token" \
-            -d "domain=$input")
+                            -H "Authorization: Bearer $login_token" \
+                            -H "Content-Type: application/json" \
+                            -d "{\"domain\":\"$input\"}")
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             password=$(echo "$response" | grep -o '"password":"[^"]*"' | sed -e 's/^"password":"//' -e 's/"$//')
             if [ "$error" != "" ]; then
@@ -240,7 +242,7 @@ while true; do
             echo "${tty_blue}<<${tty_reset} list"
             echo ""
             response=$(curl -s -X GET "https://beta.dyn.la/list" \
-            -H "Authorization: Bearer $login_token")
+                            -H "Authorization: Bearer $login_token")
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             domains=$(echo "$response" | grep -o '"domains":"[^"]*"' | sed -e 's/^"domains":"//' -e 's/"$//')
             if [ "$error" != "" ]; then
@@ -264,8 +266,9 @@ while true; do
                 *) input="${input}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/log" \
-            -H "Authorization: Bearer $login_token" \
-            -d "domain=$input")
+                            -H "Authorization: Bearer $login_token" \
+                            -H "Content-Type: application/json" \
+                            -d "{\"domain\":\"$input\"}")
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             logs=$(echo "$response" | grep -o '"logs":"[^"]*"' | sed -e 's/^"logs":"//' -e 's/"$//')
             if [ "$error" != "" ]; then
@@ -283,27 +286,31 @@ while true; do
             echo "${tty_green}>>${tty_reset}"
             echo "Usage Instructions:"
             echo "-  Update domain without specifying IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]\""
             echo ""
             echo "-  Update domain with a specified IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=1.2.3.4\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]&myip=1.2.3.4\""
             echo ""
             echo "-  Get current IP from 4.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 4.ip.plus/myip)\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]&myip=\$(curl -s 4.ip.plus/myip)\""
             echo ""
             echo "-  Get current IP from 6.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 6.ip.plus/myip)\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]&myip=\$(curl -s 6.ip.plus/myip)\""
             echo ""
             echo "POST Requests:"
             echo "-  Update domain using POST method:"
-            echo "   curl -X POST https://dns.dyn.la/update -d \"password=[YOURPASSWORD]\" -d \"domain=[YOURDOMAIN]\""
+            echo "   curl -X POST https://dns.dyn.la/update -H "Content-Type: application/json" -d "{\"password\":\"YOUR_PASSWORD\", \"domain\":\"YOUR_DOMAIN\"}")"
             echo ""
             echo "TXT Record:"
             echo "-  Add a TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=sometext\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]&txt=sometext\""
             echo ""
             echo "-  Delete a TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=clear\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]&txt=clear\""
+            echo ""
+            echo "Retrieve detailed responses in JSON format:"
+            echo "-  Include the format=json parameter in the request:"
+            echo "   curl \"https://dns.dyn.la/update?password=[YOUR_PASSWORD]&domain=[YOUR_DOMAIN]&format=json\""
             echo ""
             # read -p "Press enter to continue..."
             ;;
