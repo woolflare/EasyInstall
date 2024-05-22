@@ -237,10 +237,10 @@ while true; do
         l)
             echo "[List all DDNS]"
             echo ""
-            response=$(curl -s -X GET "https://beta.dyn.la/list" \
-            -H "Authorization: Bearer $login_token")
             echo "${tty_blue}<<${tty_reset} list"
             echo ""
+            response=$(curl -s -X GET "https://beta.dyn.la/list" \
+            -H "Authorization: Bearer $login_token")
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             domains=$(echo "$response" | grep -o '"domains":"[^"]*"' | sed -e 's/^"domains":"//' -e 's/"$//')
             if [ "$error" != "" ]; then
@@ -266,7 +266,6 @@ while true; do
             response=$(curl -s -X POST "https://beta.dyn.la/log" \
             -H "Authorization: Bearer $login_token" \
             -d "domain=$input")
-
             error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
             logs=$(echo "$response" | grep -o '"logs":"[^"]*"' | sed -e 's/^"logs":"//' -e 's/"$//')
             if [ "$error" != "" ]; then
