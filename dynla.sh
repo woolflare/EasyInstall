@@ -104,7 +104,7 @@ done
 echo "Authorization successful!"
 if [ -z "$login_credential" ]; then
     read -p "Do you want to save the login credential to the current directory? (y/n): " save_creds
-    if [[ $save_creds == "y" || $save_creds == "Y" ]]; then
+    if [ "$save_creds" = "y" ] || [ "$save_creds" = "Y" ]; then
         echo $token > .dynla
         echo "Login credential saved to .dynla file."
     else
