@@ -95,7 +95,7 @@ while [ -z "$token" ]; do
             echo "错误描述：$error_description"
             exit 1
         else
-            echo "等待授权中...（$interval秒后重试）"
+            echo "等待授权中...（${interval}秒后重试）"
         fi
     else
         echo "未获得有效的访问令牌，继续尝试..."
