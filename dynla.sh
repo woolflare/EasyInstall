@@ -104,7 +104,7 @@ done
 echo "Authorization successful!"
 if [ -z "$login_credential" ]; then
     read -p "Do you want to save the login credential to the current directory? (y/n): " save_creds
-    if [ "$save_creds" = "y" ] || [ "$save_creds" = "Y" ]; then
+    if [[ $save_creds == "y" || $save_creds == "Y" ]]; then
         echo $token > .dynla
         echo "Login credential saved to .dynla file."
     else
@@ -156,26 +156,29 @@ while true; do
             echo ""
             echo "Enter domain, e.g., test.dyn.la:"
             echo ""
-            read -p "${tty_blue}<<${tty_reset} " domain
+            read -p "${tty_blue}<<${tty_reset} " input
             echo ""
-            case "$domain" in
+            case "$input" in
                 *.dyn.la) ;;
-                *) domain="${domain}.dyn.la"
+                *) input="${input}.dyn.la"
             esac
             response=$(curl -s -X POST "https://beta.dyn.la/new" \
             -H "Authorization: Bearer $login_token" \
-            -d "domain=$domain")
-            echo "${tty_green}>>${tty_reset} $response"
-            echo ""
+            -d "domain=$input")
 
-            re_status=$(echo "$response" | cut -d ' ' -f1)
-            re_domain=$(echo "$response" | cut -d ' ' -f2)
-            re_password=$(echo "$response" | cut -d ' ' -f3)
-
-            if [ "$re_status" = "ok" ]; then
+            error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
+            domain=$(echo "$response" | grep -o '"domain":"[^"]*"' | sed -e 's/^"domain":"//' -e 's/"$//')
+            password=$(echo "$response" | grep -o '"password":"[^"]*"' | sed -e 's/^"password":"//' -e 's/"$//')
+            if [ "$error" != "" ]; then
+                echo "${tty_green}>>${tty_reset} Error: $error"
+                echo ""
+            else
+                echo "${tty_green}>>${tty_reset} Domain: $domain"
+                echo "${tty_green}>>${tty_reset} Password: $password"
+                echo ""
                 echo "Use the following link to update your DDNS:"
                 echo ""
-                echo "curl \"https://dns.dyn.la/update?password=${re_password}&domain=${re_domain}\""
+                echo "curl \"https://dns.dyn.la/update?password=${password}&domain=${domain}\""
                 echo ""
                 echo "For more usage, refer to the help with ${tty_green}h${tty_reset}"
                 echo ""
@@ -187,17 +190,23 @@ while true; do
             echo ""
             echo "Enter domain to delete, e.g., test.dyn.la:"
             echo ""
-            read -p "${tty_red}<<${tty_reset} " domain
+            read -p "${tty_red}<<${tty_reset} " input
             echo ""
-            case "$domain" in
+            case "$input" in
                 *.dyn.la) ;;
-                *) domain="${domain}.dyn.la"
+                *) input="${input}.dyn.la"
             esac
-            response=$(curl -s -X GET "https://beta.dyn.la/delete" \
+            response=$(curl -s -X POST "https://beta.dyn.la/delete" \
             -H "Authorization: Bearer $login_token" \
-            -d "domain=$domain")
-            echo "${tty_green}>>${tty_reset} $response"
-            echo ""
+            -d "domain=$input")
+            error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
+            if [ "$error" != "" ]; then
+                echo "${tty_green}>>${tty_reset} Error: $error"
+                echo ""
+            else
+                echo "${tty_green}>>${tty_reset} Deleted domain $input"
+                echo ""
+            fi
             # read -p "Press enter to continue..."
             ;;
         r)
@@ -205,17 +214,24 @@ while true; do
             echo ""
             echo "Enter domain for password reset, e.g., test.dyn.la:"
             echo ""
-            read -p "${tty_blue}<<${tty_reset} " domain
+            read -p "${tty_blue}<<${tty_reset} " input
             echo ""
-            case "$domain" in
+            case "$input" in
                 *.dyn.la) ;;
-                *) domain="${domain}.dyn.la"
+                *) input="${input}.dyn.la"
             esac
-            response=$(curl -s -X GET "https://beta.dyn.la/reset" \
+            response=$(curl -s -X POST "https://beta.dyn.la/reset" \
             -H "Authorization: Bearer $login_token" \
-            -d "domain=$domain")
-            echo "${tty_green}>>${tty_reset} $response"
-            echo ""
+            -d "domain=$input")
+            error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
+            password=$(echo "$response" | grep -o '"password":"[^"]*"' | sed -e 's/^"password":"//' -e 's/"$//')
+            if [ "$error" != "" ]; then
+                echo "${tty_green}>>${tty_reset} Error: $error"
+                echo ""
+            else
+                echo "${tty_green}>>${tty_reset} New password: $password"
+                echo ""
+            fi
             # read -p "Press enter to continue..."
             ;;
         l)
@@ -225,8 +241,15 @@ while true; do
             -H "Authorization: Bearer $login_token")
             echo "${tty_blue}<<${tty_reset} list"
             echo ""
-            echo "${tty_green}>>${tty_reset} $response"
-            echo ""
+            error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
+            domains=$(echo "$response" | grep -o '"domains":"[^"]*"' | sed -e 's/^"domains":"//' -e 's/"$//')
+            if [ "$error" != "" ]; then
+                echo "${tty_green}>>${tty_reset} Error: $error"
+                echo ""
+            else
+                echo "${tty_green}>>${tty_reset} Domains list: $domains"
+                echo ""
+            fi
             # read -p "Press enter to continue..."
             ;;
         s)
@@ -234,17 +257,25 @@ while true; do
             echo ""
             echo "Enter domain, e.g., test.dyn.la:"
             echo ""
-            read -p "${tty_blue}<<${tty_reset} " domain
+            read -p "${tty_blue}<<${tty_reset} " input
             echo ""
-            case "$domain" in
+            case "$input" in
                 *.dyn.la) ;;
-                *) domain="${domain}.dyn.la"
+                *) input="${input}.dyn.la"
             esac
-            response=$(curl -s -X GET "https://beta.dyn.la/log" \
+            response=$(curl -s -X POST "https://beta.dyn.la/log" \
             -H "Authorization: Bearer $login_token" \
-            -d "domain=$domain")
-            echo "${tty_green}>>${tty_reset} $response"
-            echo ""
+            -d "domain=$input")
+
+            error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
+            logs=$(echo "$response" | grep -o '"logs":"[^"]*"' | sed -e 's/^"logs":"//' -e 's/"$//')
+            if [ "$error" != "" ]; then
+                echo "${tty_green}>>${tty_reset} Error: $error"
+                echo ""
+            else
+                echo "${tty_green}>>${tty_reset} Logs: $logs"
+                echo ""
+            fi
             # read -p "Press enter to continue..."
             ;;
         h)
@@ -253,27 +284,27 @@ while true; do
             echo "${tty_green}>>${tty_reset}"
             echo "Usage Instructions:"
             echo "-  Update domain without specifying IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]\""
             echo ""
             echo "-  Update domain with a specified IP address:"
-            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&myip=1.2.3.4\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=1.2.3.4\""
             echo ""
             echo "-  Get current IP from 4.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&myip=\$(curl -s 4.ip.plus/myip)\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 4.ip.plus/myip)\""
             echo ""
             echo "-  Get current IP from 6.ip.plus and update domain:"
-            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&myip=\$(curl -s 6.ip.plus/myip)\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&myip=\$(curl -s 6.ip.plus/myip)\""
             echo ""
             echo "POST Requests:"
             echo "-  Update domain using POST method:"
-            echo "   curl -X POST https://dns.dyn.la/update -d \"password=YOURPASSWORD\" -d \"domain=YOURDOMAIN\""
+            echo "   curl -X POST https://dns.dyn.la/update -d \"password=[YOURPASSWORD]\" -d \"domain=[YOURDOMAIN]\""
             echo ""
             echo "TXT Record:"
             echo "-  Add a TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&txt=sometext\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=sometext\""
             echo ""
             echo "-  Delete a TXT record:"
-            echo "   curl \"https://dns.dyn.la/update?password=YOURPASSWORD&domain=YOURDOMAIN&txt=clear\""
+            echo "   curl \"https://dns.dyn.la/update?password=[YOURPASSWORD]&domain=[YOURDOMAIN]&txt=clear\""
             echo ""
             # read -p "Press enter to continue..."
             ;;
