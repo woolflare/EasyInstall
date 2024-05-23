@@ -57,6 +57,14 @@ if [ -z "$token" ]; then
     -H "Accept: application/json" \
     -d "client_id=Ov23lixTcMeZpkmqNiWJ")
 
+    if [ -z "$response" ]; then
+        echo ""
+        echo "${tty_red}Error${tty_reset}"
+        echo ""
+        echo "Login failed: Unable to connect to GitHub."
+        exit 1
+    fi
+
     device_code=$(echo "$response" | grep -o '"device_code":"[^"]*"' | sed -e 's/^"device_code":"//' -e 's/"$//')
     user_code=$(echo "$response" | grep -o '"user_code":"[^"]*"' | sed -e 's/^"user_code":"//' -e 's/"$//')
     verification_uri=$(echo "$response" | grep -o '"verification_uri":"[^"]*"' | sed -e 's/^"verification_uri":"//' -e 's/"$//')
@@ -334,4 +342,5 @@ else
     echo ""
     echo "This might be caused by invalid or expired login credentials."
     echo "Remove login credentials with 'unset DYNLA' or 'rm ./.dynla' and try again."
+    exit 1
 fi
