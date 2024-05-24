@@ -53,7 +53,7 @@ fi
 login_token=$login_credential
 
 if [ -z "$login_token" ]; then
-    response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/device/code" \
+    response=$(curl -s -X POST "https://github.com/login/device/code" \
     -H "Accept: application/json" \
     -d "client_id=Ov23lixTcMeZpkmqNiWJ")
 
@@ -85,7 +85,7 @@ if [ -z "$login_token" ]; then
     token=""
     while [ -z "$token" ]; do
         sleep "$interval"
-        token_response=$(curl -s -X POST "https://p.ip.vg/?url=https://github.com/login/oauth/access_token" \
+        token_response=$(curl -s -X POST "https://github.com/login/oauth/access_token" \
         -H "Accept: application/json" \
         -d "client_id=Ov23lixTcMeZpkmqNiWJ" \
         -d "device_code=$device_code" \
@@ -346,6 +346,6 @@ else
     echo "${tty_green}>>${tty_reset} $login_error"
     echo ""
     echo "This might be caused by invalid or expired login credentials."
-    echo "Remove login credentials with 'unset DYNLA' or 'rm ./.dynla' and try again."
+    echo "Remove login credentials with 'unset DYNLA' or 'rm .dynla' and try again."
     exit 1
 fi
