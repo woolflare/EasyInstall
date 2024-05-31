@@ -209,10 +209,9 @@ if [ "$username" ]; then
                     *.dyn.la) ;;
                     *) input="${input}.dyn.la"
                 esac
-                response=$(curl -s -X POST "https://beta.dyn.la/delete" \
+                response=$(curl -s -X DELETE "https://beta.dyn.la/delete?domain=$input" \
                                 -H "Authorization: Bearer $login_token" \
-                                -H "Content-Type: application/json" \
-                                -d "{\"domain\":\"$input\"}")
+                                -H "Content-Type: application/json")
                 error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
                 if [ "$error" != "" ]; then
                     echo "${tty_green}>>${tty_reset} Error: $error"
@@ -278,10 +277,9 @@ if [ "$username" ]; then
                     *.dyn.la) ;;
                     *) input="${input}.dyn.la"
                 esac
-                response=$(curl -s -X POST "https://beta.dyn.la/log" \
+                response=$(curl -s -X GET "https://beta.dyn.la/log?domain=$input" \
                                 -H "Authorization: Bearer $login_token" \
-                                -H "Content-Type: application/json" \
-                                -d "{\"domain\":\"$input\"}")
+                                -H "Content-Type: application/json")
                 error=$(echo "$response" | grep -o '"error":"[^"]*"' | sed -e 's/^"error":"//' -e 's/"$//')
                 logs=$(echo "$response" | grep -o '"logs":"[^"]*"' | sed -e 's/^"logs":"//' -e 's/"$//')
                 if [ "$error" != "" ]; then
