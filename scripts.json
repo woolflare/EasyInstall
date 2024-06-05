@@ -13,6 +13,7 @@
     "rvm.sh": "https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer",
     "snell.sh": "https://raw.githubusercontent.com/woolflare/install.is/main/snell.sh",
     "speedtest.sh": "https://raw.githubusercontent.com/P3TERX/script/master/speedtest-cli.sh",
+    "tailscale.sh": "https://raw.githubusercontent.com/tailscale/tailscale/main/scripts/installer.sh",
     "v2ray.sh": "https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh",
     "yarn.sh": "https://raw.githubusercontent.com/yarnpkg/website/master/install.sh"
 }
