@@ -2,11 +2,8 @@
 
 set -e
 
-Green_font_prefix="\033[32m"
-Red_font_prefix="\033[31m"
-Font_color_suffix="\033[0m"
-INFO="[${Green_font_prefix}INFO${Font_color_suffix}]"
-ERROR="[${Red_font_prefix}ERROR${Font_color_suffix}]"
+INFO="[INFO]"
+ERROR="[ERROR]"
 
 PROJECT_NAME='Ookla Speedtest CLI'
 BIN_DIR='/usr/local/bin'
