@@ -49,7 +49,7 @@ jobs:
             <p>To install a specific package using <code>install.is</code>, use the following <code>curl</code> command:</p>
             <pre><code>curl -L ezi.sh/[package_name] | bash</code></pre>
             <p>Replace <code>[package_name]</code> with the name of the desired script. For example, to install <code>acme.sh</code>, you would use:</p>
-            <pre><code>curl -L ezi/acme.sh | bash</code></pre>
+            <pre><code>curl -L ezi.sh/acme | bash</code></pre>
             <h1>Available Scripts List</h1>
             <table border="1">
                 <thead>
