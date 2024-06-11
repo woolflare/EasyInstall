@@ -83,7 +83,7 @@ jobs:
           git commit -m 'Update files'
           git push
         else
-          echo "No changes to commit for script files"
+          echo "No changes to commit"
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
