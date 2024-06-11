@@ -59,7 +59,7 @@ jobs:
                     $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><code>sh <(curl -s https://ezi.sh/\(.key))</code></td><td><a href=\"\(.value)\">Link</a></td></tr>"' scripts.json)
                 </tbody>
             </table>
-            <p>For more details, visit our <a href="https://github.com/woolflare/install.is">GitHub repository</a>.</p>
+            <p>For more details, visit our <a href="https://github.com/woolflare/EasyInstall">GitHub repository</a>.</p>
         </body>
         </html>
         EOF
