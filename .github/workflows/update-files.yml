@@ -42,21 +42,21 @@ jobs:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta name="description" content="Automatic installation script collection.">
-            <title>Install Scripts - install.is</title>
+            <title>EasyInstall - easyinstall.net</title>
         </head>
         <body>
             <h1>Usage</h1>
             <p>To install a specific package using <code>install.is</code>, use the following <code>curl</code> command:</p>
-            <pre><code>curl -L install.is/[package_name] | bash</code></pre>
+            <pre><code>curl -L ezi.sh/[package_name] | bash</code></pre>
             <p>Replace <code>[package_name]</code> with the name of the desired script. For example, to install <code>acme.sh</code>, you would use:</p>
-            <pre><code>curl -L install.is/acme.sh | bash</code></pre>
+            <pre><code>curl -L ezi/acme.sh | bash</code></pre>
             <h1>Available Scripts List</h1>
             <table border="1">
                 <thead>
                     <tr><th>File Name</th><th>Command</th><th>Source</th></tr>
                 </thead>
                 <tbody>
-                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><code>sh <(curl -s https://install.is/\(.key))</code></td><td><a href=\"\(.value)\">Link</a></td></tr>"' scripts.json)
+                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><code>sh <(curl -s https://ezi.sh/\(.key))</code></td><td><a href=\"\(.value)\">Link</a></td></tr>"' scripts.json)
                 </tbody>
             </table>
             <p>For more details, visit our <a href="https://github.com/woolflare/install.is">GitHub repository</a>.</p>
