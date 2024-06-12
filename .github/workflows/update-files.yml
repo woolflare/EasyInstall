@@ -31,7 +31,7 @@ jobs:
 
     - name: Download packages.json
       run: |
-        curl -o packages.json https://raw.githubusercontent.com/woolflare/EasyInstall/main/packages.json
+        curl -o packages.json https://raw.githubusercontent.com/woolflare/easyinstall.net/main/packages.json
 
     - name: Update files from packages.json
       run: |
