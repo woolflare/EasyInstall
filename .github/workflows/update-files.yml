@@ -29,52 +29,13 @@ jobs:
         git fetch origin
         git rebase origin/main
 
-    - name: Update files from scripts.json
+    - name: Download packages.json
       run: |
-        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value)"' scripts.json | parallel --gnu -j 4
+        curl -o packages.json https://raw.githubusercontent.com/woolflare/EasyInstall/main/packages.json
 
-    - name: Generate HTML page
+    - name: Update files from packages.json
       run: |
-        cat > index.html <<EOF
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta name="description" content="Automatic installation script collection.">
-            <title>EasyInstall - easyinstall.net</title>
-        </head>
-        <body>
-            <h1>Usage</h1>
-            <p>To install a specific package using <code>install.is</code>, use the following <code>curl</code> command:</p>
-            <pre><code>curl -L ezi.sh/[package_name] | bash</code></pre>
-            <p>Replace <code>[package_name]</code> with the name of the desired script. For example, to install <code>acme.sh</code>, you would use:</p>
-            <pre><code>curl -L ezi.sh/acme | bash</code></pre>
-            <h1>Available Scripts List</h1>
-            <table border="1">
-                <thead>
-                    <tr><th>File Name</th><th>Command</th><th>Source</th></tr>
-                </thead>
-                <tbody>
-                    $(jq -r 'to_entries | sort_by(.key)[] | "<tr><td>\(.key)</td><td><code>sh <(curl -s https://ezi.sh/\(.key))</code></td><td><a href=\"\(.value)\">Link</a></td></tr>"' scripts.json)
-                </tbody>
-            </table>
-            <p>For more details, visit our <a href="https://github.com/woolflare/EasyInstall">GitHub repository</a>.</p>
-        </body>
-        </html>
-        EOF
-
-    - name: Commit and push HTML changes
-      run: |
-        if [ -n "$(git status --porcelain | grep index.html)" ]; then
-          git add index.html
-          git commit -m 'Regenerate HTML index page'
-          git push
-        else
-          echo "No changes to commit for index.html"
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value)"' packages.json | parallel --gnu -j 4
 
     - name: Commit and push script changes
       run: |
