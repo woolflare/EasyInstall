@@ -35,7 +35,7 @@ jobs:
 
     - name: Update files from packages.json
       run: |
-        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value)"' packages.json | parallel --gnu -j 4
+        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value.installer_url)"' package.json | parallel --gnu -j 4
 
     - name: Commit and push script changes
       run: |
