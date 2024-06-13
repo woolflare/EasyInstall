@@ -27,7 +27,7 @@ jobs:
         curl -o packages.json https://raw.githubusercontent.com/woolflare/easyinstall.net/main/packages.json
     - name: Update files from packages.json
       run: |
-        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value.installer_source)"' package.json | parallel --gnu -j 4
+        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value.installer_source)"' packages.json | parallel --gnu -j 4
     - name: Commit and push script changes
       run: |
         if [ -n "$(git status --porcelain)" ]; then
