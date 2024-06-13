@@ -1,7 +1,7 @@
 {
     "acme": {
         "description": "A pure Unix shell script implementing ACME client protocol",
-        "website": "https://acme.sh",
+        "website": "https://github.com/acmesh-official/acme.sh",
         "installer_source": "https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh"
     },
     "ddns_cf": {
@@ -38,6 +38,11 @@
         "description": "A script to install Hysteria server",
         "website": "https://github.com/apernet/hysteria",
         "installer_source": "https://raw.githubusercontent.com/apernet/hysteria/master/scripts/install_server.sh"
+    },
+    "nvm": {
+        "description": "Node Version Manager",
+        "website": "https://github.com/nvm-sh/nvm",
+        "installer_source": "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh"
     },
     "ohmyzsh": {
         "description": "A delightful community-driven framework for managing your zsh configuration",
