@@ -28,7 +28,7 @@ jobs:
     - name: Generate HTML pages
       run: |
         # Generate index.html
-        cat > index.html << 'EOF'
+        cat > index.html <<EOF
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -62,7 +62,7 @@ jobs:
                     </div>
                 </div>
             </nav>
-        
+
             <div class="container">
                 <h1 id="usage">Usage</h1>
                 <p>To install a specific package using <code>EasyInstall</code>, use the following <code>curl</code> command:</p>
@@ -92,7 +92,7 @@ jobs:
             website=$(echo "$package" | jq -r '.value.website')
             installer_url=$(echo "$package" | jq -r '.value.installer_url')
 
-            cat << 'EOF' > ${key}.html
+            cat > ${key}.html <<EOF
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -109,20 +109,20 @@ jobs:
                         <a class="navbar-brand" href="/">EasyInstall</a>
                     </div>
                 </nav>
-            
+
                 <div class="container">
                     <h1 id="usage">${key}</h1>
                     <p>${description}</p>
                     <p><a href="${website}">Website</a> | <a href="${installer_url}">Installer Source</a></p>
                     <h1>Install ${key}</h1>
                     <p>Paste this into Terminal.app or a shell prompt, and press enter.</p>
-                    <p><code>curl -s https://ezi.sh/${key} | sh</code><p>
+                    <p><code>curl -s https://ezi.sh/${key} | sh</code></p>
                     <p>For more details, visit our <a href="https://github.com/woolflare/EasyInstall">GitHub repository</a>.</p>
                 </div>
             </body>
             </html>
             EOF
-                    done
+        done
 
     - name: Commit and push HTML changes
       run: |
