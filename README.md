@@ -21,7 +21,7 @@ sh <(curl -s https://ezi.sh/homebrew)
 
 ## Available Packages
 
-All available installation packages can be found at [packages.json](https://github.com/woolflare/EasyInstall/blob/main/packages.json).
+All available installation packages can be found at [easyinstall.json](https://raw.githubusercontent.com/woolflare/EasyInstall/main/easyinstall.json).
 
 ### Examples
 
