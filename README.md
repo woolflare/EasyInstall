@@ -11,12 +11,12 @@ EasyInstall provides a convenient way to install various packages. Users can qui
 To install a specific package, use the following command:
 
 ```sh
-curl -s https://ezi.sh/[package_name] | sh
+sh <(curl -s https://ezi.sh/[package_name])
 ```
 Replace `[package_name]` with the name of the desired package. For example, to install homebrew, you would use:
 
 ```sh
-curl -s https://ezi.sh/homebrew | sh
+sh <(curl -s https://ezi.sh/homebrew)
 ```
 
 ## Available Packages
@@ -30,19 +30,19 @@ Below are examples of installing some common packages:
 **Homebrew:**
 
 ```sh
-curl -s https://ezi.sh/homebrew | sh
+sh <(curl -s https://ezi.sh/homebrew)
 ```
 
 **Node Version Manager (NVM):**
 
 ```sh
-curl -s https://ezi.sh/nvm | sh
+sh <(curl -s https://ezi.sh/nvm)
 ```
 
 **Oh My Zsh:**
 
 ```sh
-curl -s https://ezi.sh/ohmyzsh | sh
+sh <(curl -s https://ezi.sh/ohmyzsh)
 ```
 
 ## Contribution
