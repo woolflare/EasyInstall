@@ -28,15 +28,15 @@ else
     echo "Please download the script and run it locally for interactive features."
     echo "Use the following commands to download and run the script:"
     echo ""
-    echo "  curl -O https://install.is/dynla.sh"
-    echo "  chmod +x dynla.sh"
-    echo "  ./dynla.sh"
+    echo "  curl -O https://ezi.sh/dyn.la"
+    echo "  chmod +x dyn.la"
+    echo "  ./dyn.la"
     echo ""
     echo "Or run it directly in an interactive shell:"
     echo ""
-    echo "  sh -c \"\$(curl -fsSL https://install.is/dynla.sh)\""
+    echo "  sh -c \"\$(curl -fsSL https://ezi.sh/dyn.la)\""
     echo ""
-    exit 1 
+    exit 1
 fi
 
 login_credential=${DYNLA:-}
