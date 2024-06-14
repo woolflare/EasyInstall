@@ -9,30 +9,20 @@ jobs:
     steps:
     - name: Checkout repository content
       uses: actions/checkout@v4
+
     - name: Set up jq and GNU Parallel
       run: |
         sudo apt-get update
         sudo apt-get install -y jq parallel
-    - name: Configure git settings
-      run: |
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-    - name: Clean and pull latest changes
-      run: |
-        git reset --hard
-        git fetch origin
-        git rebase origin/main
+
     - name: Update files from easyinstall.json
       run: |
         jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value.installer_source)"' easyinstall.json | parallel --gnu -j 4
+
     - name: Commit and push script changes
       run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          git add .
-          git commit -m 'Update files'
-          git push
-        else
-          echo "No changes to commit"
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add .
+        git commit -m 'Update files' || echo "No changes to commit"
+        git push
