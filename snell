@@ -20,8 +20,26 @@ EXTRACTED="snell-server"
 
 # Check and install unzip if not present
 if ! command -v unzip > /dev/null 2>&1; then
-    echo "unzip could not be found, now installing unzip..."
-    sudo apt-get update && sudo apt-get install -y unzip
+    read -p "unzip could not be found, do you want to install unzip? (y/n): " install_zip
+    if [ "$install_zip" != "${install_zip#[Yy]}" ]; then
+        echo "Installing unzip..."
+        # Determine the package manager and install unzip
+        if command -v apt-get > /dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y unzip
+        elif command -v yum > /dev/null 2>&1; then
+            sudo yum install -y unzip
+        elif command -v dnf > /dev/null 2>&1; then
+            sudo dnf install -y unzip
+        elif command -v pacman > /dev/null 2>&1; then
+            sudo pacman -S --noconfirm unzip
+        else
+            echo "No suitable package manager found. Please install unzip manually."
+            exit 1
+        fi
+    else
+        echo "unzip is required for this script. Exiting."
+        exit 1
+    fi
 fi
 
 # Download snell-server
