@@ -36,7 +36,7 @@ else
     echo ""
     echo "  sh -c \"\$(curl -fsSL https://ezi.sh/dyn.la)\""
     echo ""
-    exit 1 
+    exit 1
 fi
 
 login_credential=${DYNLA:-}
