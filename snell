@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Define the version number
 VERSION="v4.0.1"
@@ -19,8 +19,7 @@ FILENAME="snell-server-${VERSION}-linux-${ARCH}.zip"
 EXTRACTED="snell-server"
 
 # Check and install unzip if not present
-if ! command -v unzip &> /dev/null
-then
+if ! command -v unzip > /dev/null 2>&1; then
     echo "unzip could not be found, now installing unzip..."
     sudo apt-get update && sudo apt-get install -y unzip
 fi
@@ -40,7 +39,7 @@ sudo chmod +x /usr/local/bin/snell-server
 
 # Create systemd service file
 echo "Setting up systemd service..."
-cat <<EOT | sudo tee /etc/systemd/system/snell.service
+sudo tee /etc/systemd/system/snell.service > /dev/null << EOT
 [Unit]
 Description=Snell Proxy Service
 After=network.target
@@ -63,8 +62,8 @@ EOT
 yes | /usr/local/bin/snell-server
 
 # Create configuration directory and move the configuration file
-mkdir -p /etc/snell
-mv snell-server.conf /etc/snell/snell-server.conf
+sudo mkdir -p /etc/snell
+sudo mv snell-server.conf /etc/snell/snell-server.conf
 
 # Enable and start the service
 echo "Enabling and starting Snell service..."
