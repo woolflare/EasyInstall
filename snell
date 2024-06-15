@@ -16,7 +16,6 @@ esac
 # Define the download URL and filename based on the architecture
 URL="https://dl.nssurge.com/snell/snell-server-${VERSION}-linux-${ARCH}.zip"
 FILENAME="snell-server-${VERSION}-linux-${ARCH}.zip"
-EXTRACTED="snell-server"
 
 # Check and install unzip if not present
 if ! command -v unzip > /dev/null 2>&1; then
@@ -42,17 +41,52 @@ if ! command -v unzip > /dev/null 2>&1; then
     fi
 fi
 
-# Download snell-server
+# Check if curl is installed, if not, prompt to install it
+if ! command -v curl > /dev/null 2>&1; then
+    read -p "curl could not be found, do you want to install curl? (y/n): " install_curl
+    if [ "$install_curl" != "${install_curl#[Yy]}" ]; then
+        echo "Installing curl..."
+        # Determine the package manager and install curl
+        if command -v apt-get > /dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y curl
+        elif command -v yum > /dev/null 2>&1; then
+            sudo yum install -y curl
+        elif command -v dnf > /dev/null 2>&1; then
+            sudo dnf install -y curl
+        elif command -v pacman > /dev/null 2>&1; then
+            sudo pacman -S --noconfirm curl
+        else
+            echo "No suitable package manager found. Please install curl manually."
+            exit 1
+        fi
+    else
+        echo "curl is required for this script. Exiting."
+        exit 1
+    fi
+fi
+
+# Download snell-server using curl
 echo "Downloading Snell Server from $URL..."
-wget $URL
+curl -L -o $FILENAME $URL
 
 # Extract files
 echo "Extracting files..."
 unzip $FILENAME
 
+# Check the extracted files
+echo "Listing extracted files..."
+ls -l
+
+# Find the snell-server binary
+EXTRACTED=$(find . -name 'snell-server' -type f)
+if [ ! -f "$EXTRACTED" ]; then
+    echo "Error: snell-server binary not found after extraction."
+    exit 1
+fi
+
 # Move snell-server to /usr/local/bin
 echo "Installing Snell Server..."
-sudo mv $EXTRACTED /usr/local/bin/snell-server
+sudo mv "$EXTRACTED" /usr/local/bin/snell-server
 sudo chmod +x /usr/local/bin/snell-server
 
 # Create systemd service file
