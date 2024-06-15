@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Configurations
 CF_API_EMAIL="your_cloudflare_email"
@@ -19,7 +19,7 @@ else
     OLD_IP=""
 fi
 
-if [ "$CURRENT_IP" == "$OLD_IP" ]; then
+if [ "$CURRENT_IP" = "$OLD_IP" ]; then
     echo "No changes in IP address. No update needed."
     exit 0
 fi
