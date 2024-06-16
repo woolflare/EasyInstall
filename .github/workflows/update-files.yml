@@ -17,7 +17,7 @@ jobs:
 
     - name: Update files from easyinstall.json
       run: |
-        jq -r 'to_entries | sort_by(.key)[] | "curl -o \(.key) \(.value.installer_source)"' easyinstall.json | parallel --gnu -j 4
+        jq -r 'to_entries | sort_by(.key)[] | "curl -fsSL -o \(.key) \(.value.installer_source)"' easyinstall.json | parallel --gnu -j 4
 
     - name: Commit and push script changes
       run: |
