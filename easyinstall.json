@@ -9,6 +9,11 @@
         "website": "https://github.com/woolflare/EasyInstall",
         "installer_source": "https://raw.githubusercontent.com/woolflare/EasyInstall/main/ddns_cf"
     },
+    "deno": {
+        "description": "A modern runtime for JavaScript and TypeScript",
+        "website": "https://deno.com/",
+        "installer_source": "https://deno.land/install.sh"
+    },
     "dnsproxy": {
         "description": "A lightweight DNS proxy",
         "website": "https://github.com/woolflare/EasyInstall",
