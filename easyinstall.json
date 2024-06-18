@@ -58,7 +58,7 @@
         "description": "Fast, disk space efficient package manager",
         "website": "https://pnpm.io",
         "installer_source": "https://get.pnpm.io/install.sh"
-    }
+    },
     "pyenv": {
         "description": "Simple Python version management",
         "website": "https://github.com/pyenv/pyenv",
