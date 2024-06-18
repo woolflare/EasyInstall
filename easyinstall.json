@@ -54,6 +54,11 @@
         "website": "https://ohmyz.sh",
         "installer_source": "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
     },
+    "pnmp": {
+        "description": "Fast, disk space efficient package manager",
+        "website": "https://pnpm.io",
+        "installer_source": "https://get.pnpm.io/install.sh"
+    }
     "pyenv": {
         "description": "Simple Python version management",
         "website": "https://github.com/pyenv/pyenv",
