@@ -29,6 +29,11 @@
         "website": "https://github.com/woolflare/EasyInstall",
         "installer_source": "https://raw.githubusercontent.com/woolflare/EasyInstall/main/dyn.la"
     },
+    "fnm": {
+        "description": "Fast and simple Node.js version manager",
+        "website": "https://github.com/Schniz/fnm",
+        "installer_source": "https://fnm.vercel.app/install"
+    },
     "helm": {
         "description": "The Kubernetes package manager",
         "website": "https://helm.sh",
