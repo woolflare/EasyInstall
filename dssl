@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 
+# 自解压逻辑
 if [ -f "$0" ]; then
     eval "$(sed '1,/^SCRIPT/d' "$0")"
     exit 0
@@ -116,7 +117,7 @@ create_txt_record() {
 # Delete TXT record
 delete_txt_record() {
     echo "Deleting TXT record..."
-    response=$(curl -s "${API_URL}?domain=${DOMAIN}&key=${KEY}&txt=delete")
+    response=$(curl -s "${API_URL}?domain=${DOMAIN}&key=${KEY}&txt=")
     echo "API response: $response"
     case "$response" in
         *ERROR*)
