@@ -24,10 +24,10 @@
         "website": "https://docs.docker.com/engine/install/",
         "installer_source": "https://raw.githubusercontent.com/docker/docker-install/master/install.sh"
     },
-    "dyn.la": {
-        "description": "DDNS script for dyn.la",
+    "dssl": {
+        "description": "Automatically obtain and renew Let’s Encrypt SSL certificates for DDNS.fm.",
         "website": "https://github.com/woolflare/EasyInstall",
-        "installer_source": "https://raw.githubusercontent.com/woolflare/EasyInstall/main/dyn.la"
+        "installer_source": "https://raw.githubusercontent.com/woolflare/EasyInstall/main/dssl"
     },
     "fnm": {
         "description": "Fast and simple Node.js version manager",
