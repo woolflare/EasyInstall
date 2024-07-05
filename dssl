@@ -47,8 +47,7 @@ check_dependencies() {
 check_dependencies
 
 # Set working directory
-SCRIPT_DIR=$(CDPATH="" cd -- "$(dirname -- "$0")" && pwd)
-WORK_DIR="$SCRIPT_DIR/.letsencrypt"
+WORK_DIR="$HOME/.letsencrypt"
 CONFIG_FILE="$WORK_DIR/config"
 
 # Create working directory
