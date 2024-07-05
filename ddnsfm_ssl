@@ -1,4 +1,9 @@
 #!/bin/sh
+set -e
+
+SCRIPT=$(cat <<'EOT'
+
+#!/bin/sh
 
 check_dependencies() {
     dependencies="certbot openssl curl"
@@ -209,3 +214,32 @@ case "$1" in
         fi
         ;;
 esac
+
+main() {
+    case "$1" in
+        auth_hook)
+            auth_hook
+            ;;
+        cleanup_hook)
+            cleanup_hook
+            ;;
+        *)
+            # 原来的主程序逻辑
+            # ...
+            ;;
+    esac
+}
+
+main "$@"
+EOT
+)
+
+if [ -f "$0" ]; then
+    eval "$SCRIPT"
+    exit 0
+fi
+
+TEMP_SCRIPT=$(mktemp)
+echo "$SCRIPT" > "$TEMP_SCRIPT"
+chmod +x "$TEMP_SCRIPT"
+exec "$TEMP_SCRIPT" "$@"
