@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-# 自解压逻辑
 if [ -f "$0" ]; then
     eval "$(sed '1,/^SCRIPT/d' "$0")"
     exit 0
