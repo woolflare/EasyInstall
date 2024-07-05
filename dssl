@@ -204,15 +204,14 @@ case "$1" in
             echo "Certificate generation successful."
             echo "Certificate location: $CERT_PATH"
             ls -l "$CERT_PATH"
-            echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
             echo "Verifying certificate..."
             verify_ecc_certificate "$CERT_PATH"
             echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-            echo "Copying certificate to $CERT_DIR"
+            echo "Copying certificates...
             cp -L "$CERT_PATH"/* "$CERT_DIR/" || { echo "Failed to copy certificates"; exit 1; }
-            echo "Certificate copied."
+            echo "Certificates copied successfully."
+            echo "Certificate files are stored in $CERT_DIR:"
             echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-            echo "Files in $CERT_DIR:"
             ls -l "$CERT_DIR"
         else
             echo "Certificate generation failed. Please check the Certbot output for errors."
