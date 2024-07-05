@@ -1,8 +1,12 @@
 #!/bin/sh
 set -e
 
-SCRIPT=$(cat <<'EOT'
+if [ -f "$0" ]; then
+    eval "$(sed '1,/^SCRIPT/d' "$0")"
+    exit 0
+fi
 
+SCRIPT=$(cat <<'EOT'
 #!/bin/sh
 
 check_dependencies() {
@@ -48,7 +52,7 @@ WORK_DIR="$SCRIPT_DIR/.letsencrypt"
 CONFIG_FILE="$WORK_DIR/config"
 
 # Create working directory
-mkdir -p "$WORK_DIR"
+mkdir -p "$WORK_DIR" || { echo "Failed to create working directory"; exit 1; }
 
 # Function: Read settings from config file or environment variables
 read_config() {
@@ -76,7 +80,7 @@ read_config() {
         echo "DOMAIN=$DOMAIN"
         echo "KEY=$KEY"
         echo "EMAIL=$EMAIL"
-    } > "$CONFIG_FILE"
+    } > "$CONFIG_FILE" || { echo "Failed to save config file"; exit 1; }
     echo "Settings saved to config file: $CONFIG_FILE"
 }
 
@@ -90,7 +94,7 @@ API_URL="https://api.ddns.fm/update"
 CERT_DIR="$WORK_DIR/certs/$DOMAIN"
 
 # Create certificate directory
-mkdir -p "$CERT_DIR"
+mkdir -p "$CERT_DIR" || { echo "Failed to create certificate directory"; exit 1; }
 
 # Create TXT record
 create_txt_record() {
@@ -206,7 +210,7 @@ case "$1" in
             verify_ecc_certificate "$CERT_PATH"
             
             echo "Copying certificate to $CERT_DIR"
-            cp -L "$CERT_PATH"/* "$CERT_DIR/"
+            cp -L "$CERT_PATH"/* "$CERT_DIR/" || { echo "Failed to copy certificates"; exit 1; }
             echo "Certificate copied. Files in $CERT_DIR:"
             ls -l "$CERT_DIR"
         else
@@ -214,30 +218,8 @@ case "$1" in
         fi
         ;;
 esac
-
-main() {
-    case "$1" in
-        auth_hook)
-            auth_hook
-            ;;
-        cleanup_hook)
-            cleanup_hook
-            ;;
-        *)
-            # 原来的主程序逻辑
-            # ...
-            ;;
-    esac
-}
-
-main "$@"
 EOT
 )
-
-if [ -f "$0" ]; then
-    eval "$SCRIPT"
-    exit 0
-fi
 
 TEMP_SCRIPT=$(mktemp)
 echo "$SCRIPT" > "$TEMP_SCRIPT"
