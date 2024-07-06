@@ -1,245 +1,67 @@
 #!/bin/sh
-set -e
 
-SCRIPT=$(cat <<'EOT'
-
-#!/bin/sh
-
-check_dependencies() {
-    dependencies="certbot openssl curl"
-    missing=""
-    for dep in $dependencies; do
-        if ! command -v "$dep" >/dev/null 2>&1; then
-            missing="$missing $dep"
-        fi
-    done
-    if [ -n "$missing" ]; then
-        echo "Error: The following required dependencies are not installed:$missing"
-        echo "Do you want to install these dependencies? (y/n)"
-        read -r install_choice
-        if [ "$install_choice" = "y" ] || [ "$install_choice" = "Y" ]; then
-            if command -v apt-get >/dev/null 2>&1; then
-                sudo apt-get update && sudo apt-get install -y $missing
-            elif command -v yum >/dev/null 2>&1; then
-                sudo yum install -y $missing
-            elif command -v dnf >/dev/null 2>&1; then
-                sudo dnf install -y $missing
-            elif command -v pacman >/dev/null 2>&1; then
-                sudo pacman -Sy --noconfirm $missing
-            elif command -v zypper >/dev/null 2>&1; then
-                sudo zypper install -y $missing
-            else
-                echo "Unable to determine your system's package manager. Please manually install the following dependencies:$missing"
-                exit 1
-            fi
-            echo "Dependencies installation completed."
-        else
-            echo "Please install these dependencies before running this script."
-            exit 1
-        fi
-    fi
-}
-
-check_dependencies
-
-# Set working directory
-SCRIPT_DIR=$(CDPATH="" cd -- "$(dirname -- "$0")" && pwd)
-WORK_DIR="$SCRIPT_DIR/.letsencrypt"
-CONFIG_FILE="$WORK_DIR/config"
-
-# Create working directory
-mkdir -p "$WORK_DIR"
-
-# Function: Read settings from config file or environment variables
-read_config() {
-    if [ -f "$CONFIG_FILE" ]; then
-        echo "Reading settings from config file..."
-        . "$CONFIG_FILE"
-    else
-        echo "Config file does not exist, trying to read from environment variables..."
-        DOMAIN=${DOMAIN:-""}
-        KEY=${KEY:-""}
-        EMAIL=${EMAIL:-""}
-    fi
-
-    # If settings are still empty, prompt user
-    if [ -z "$DOMAIN" ] || [ -z "$KEY" ] || [ -z "$EMAIL" ]; then
-        echo "Error: Missing required settings. Please set the following environment variables:"
-        echo "export DOMAIN=your-domain.dyn.la"
-        echo "export KEY=your-ddnsfm-key"
-        echo "export EMAIL=johndoe@admail.com"
-        exit 1
-    fi
-
-    # Save settings to config file
-    {
-        echo "DOMAIN=$DOMAIN"
-        echo "KEY=$KEY"
-        echo "EMAIL=$EMAIL"
-    } > "$CONFIG_FILE"
-    echo "Settings saved to config file: $CONFIG_FILE"
-}
-
-# Read configuration
-read_config
-
-# API URL
-API_URL="https://api.ddns.fm/update"
-
-# Certificate directory
-CERT_DIR="$WORK_DIR/certs/$DOMAIN"
-
-# Create certificate directory
-mkdir -p "$CERT_DIR"
-
-# Create TXT record
-create_txt_record() {
-    txt_value="$1"
-    echo "Creating TXT record..."
-    response=$(curl -s "${API_URL}?domain=${DOMAIN}&key=${KEY}&txt=${txt_value}")
-    echo "API response: $response"
-    case "$response" in
-        *ERROR*)
-            echo "Failed to create TXT record. API response: $response" >&2
-            return 1
-            ;;
-    esac
-    echo "TXT record created for ${DOMAIN} with value ${txt_value}"
-    sleep 30
-    echo "DNS propagation wait completed."
-}
-
-# Delete TXT record
-delete_txt_record() {
-    echo "Deleting TXT record..."
-    response=$(curl -s "${API_URL}?domain=${DOMAIN}&key=${KEY}&txt=delete")
-    echo "API response: $response"
-    case "$response" in
-        *ERROR*)
-            echo "Failed to delete TXT record. API response: $response" >&2
-            return 1
-            ;;
-    esac
-    echo "TXT record for ${DOMAIN} has been deleted"
-}
-
-# Authentication hook
-auth_hook() {
-    echo "Starting DNS verification..."
-    create_txt_record "$CERTBOT_VALIDATION"
-    echo "DNS verification completed."
-}
-
-# Cleanup hook
-cleanup_hook() {
-    echo "Starting DNS record cleanup..."
-    delete_txt_record
-    echo "DNS cleanup completed."
-}
-
-# Verify ECC certificate
-verify_ecc_certificate() {
-    cert_path="$1/fullchain.pem"
-    key_path="$1/privkey.pem"
-    if [ -f "$cert_path" ] && [ -f "$key_path" ]; then
-        echo "Certificate files found. Verifying certificate..."
-        
-        echo "Certificate information:"
-        openssl x509 -in "$cert_path" -text -noout | grep -E "Subject:|Issuer:|Not Before:|Not After:|Subject Alternative Name:"
-        
-        echo "Verifying if private key matches the certificate..."
-        cert_pubkey=$(openssl x509 -in "$cert_path" -noout -pubkey | openssl pkey -pubin -outform DER | openssl dgst -sha256)
-        key_pubkey=$(openssl pkey -in "$key_path" -pubout -outform DER | openssl dgst -sha256)
-        if [ "$cert_pubkey" = "$key_pubkey" ]; then
-            echo "Private key matches the certificate."
-        else
-            echo "Warning: Private key does not match the certificate!"
-            echo "Certificate public key hash: $cert_pubkey"
-            echo "Private key public key hash: $key_pubkey"
-        fi
-        
-        expiry_date=$(openssl x509 -in "$cert_path" -noout -enddate | cut -d= -f2)
-        expiry_epoch=$(date -d "$expiry_date" +%s)
-        current_epoch=$(date +%s)
-        days_left=$(( (expiry_epoch - current_epoch) / 86400 ))
-        echo "Certificate is valid for $days_left more days."
-    else
-        echo "Error: Certificate files not found in $1"
-        echo "Please check the Certbot output above for any errors."
-    fi
-}
-
-# Main program
-case "$1" in
-    auth_hook)
-        auth_hook
-        ;;
-    cleanup_hook)
-        cleanup_hook
-        ;;
-    *)
-        echo "Starting ECC certificate application..."
-        certbot certonly --manual \
-            --preferred-challenges dns \
-            --manual-auth-hook "$0 auth_hook" \
-            --manual-cleanup-hook "$0 cleanup_hook" \
-            -d "$DOMAIN" \
-            --agree-tos \
-            --no-eff-email \
-            --keep-until-expiring \
-            --non-interactive \
-            --email "$EMAIL" \
-            --config-dir "$WORK_DIR" \
-            --work-dir "$WORK_DIR" \
-            --logs-dir "$WORK_DIR/logs" \
-            --cert-name "$DOMAIN" \
-            --key-type ecdsa \
-            --elliptic-curve secp384r1
-
-        CERT_PATH="$WORK_DIR/live/$DOMAIN"
-        if [ -d "$CERT_PATH" ]; then
-            echo "Certificate generation successful."
-            echo "Certificate location: $CERT_PATH"
-            ls -l "$CERT_PATH"
-            
-            echo "Verifying certificate..."
-            verify_ecc_certificate "$CERT_PATH"
-            
-            echo "Copying certificate to $CERT_DIR"
-            cp -L "$CERT_PATH"/* "$CERT_DIR/"
-            echo "Certificate copied. Files in $CERT_DIR:"
-            ls -l "$CERT_DIR"
-        else
-            echo "Certificate generation failed. Please check the Certbot output for errors."
-        fi
-        ;;
-esac
-
-main() {
-    case "$1" in
-        auth_hook)
-            auth_hook
-            ;;
-        cleanup_hook)
-            cleanup_hook
-            ;;
-        *)
-            # 原来的主程序逻辑
-            # ...
-            ;;
-    esac
-}
-
-main "$@"
-EOT
-)
-
-if [ -f "$0" ]; then
-    eval "$SCRIPT"
-    exit 0
+# Configurations
+CF_API_EMAIL="your_cloudflare_email"
+CF_API_KEY="your_cloudflare_api_key"
+DOMAIN="your_domain_name"
+RECORD_NAME="your_record_name" # e.g., "www" for www.example.com
+IP_FILE="/root/$RECORD_NAME.$DOMAIN.txt"
+CF_API="https://api.cloudflare.com/client/v4"
+# Get the current IP address
+CURRENT_IP=$(curl -s ip.plus/myip)
+# Check if IP has changed
+if [ -f "$IP_FILE" ]; then
+    OLD_IP=$(cat "$IP_FILE")
+else
+    OLD_IP=""
 fi
 
-TEMP_SCRIPT=$(mktemp)
-echo "$SCRIPT" > "$TEMP_SCRIPT"
-chmod +x "$TEMP_SCRIPT"
-exec "$TEMP_SCRIPT" "$@"
+if [ "$CURRENT_IP" = "$OLD_IP" ]; then
+    echo "No changes in IP address. No update needed."
+    exit 0
+fi
+# Get Zone ID
+ZONE_ID=$(curl -s -X GET "$CF_API/zones?name=$DOMAIN" \
+     -H "X-Auth-Email: $CF_API_EMAIL" \
+     -H "X-Auth-Key: $CF_API_KEY" \
+     -H "Content-Type: application/json" | grep -o '"id":"[^"]*' | head -1 | cut -d'"' -f4)
+if [ -z "$ZONE_ID" ]; then
+    echo "Error: Could not retrieve Zone ID."
+    exit 1
+fi
+# Get Record ID
+RECORD_ID=$(curl -s -X GET "$CF_API/zones/$ZONE_ID/dns_records?type=A&name=$RECORD_NAME.$DOMAIN" \
+     -H "X-Auth-Email: $CF_API_EMAIL" \
+     -H "X-Auth-Key: $CF_API_KEY" \
+     -H "Content-Type: application/json" | grep -o '"id":"[^"]*' | head -1 | cut -d'"' -f4)
+if [ -z "$RECORD_ID" ]; then
+    echo "No DNS record found. Creating a new one."
+    CREATE_RESPONSE=$(curl -s -X POST "$CF_API/zones/$ZONE_ID/dns_records" \
+        -H "X-Auth-Email: $CF_API_EMAIL" \
+        -H "X-Auth-Key: $CF_API_KEY" \
+        -H "Content-Type: application/json" \
+        --data "{\"type\":\"A\",\"name\":\"$RECORD_NAME.$DOMAIN\",\"content\":\"$CURRENT_IP\",\"ttl\":120,\"proxied\":false}")
+    if echo "$CREATE_RESPONSE" | grep -q '"success":true'; then
+        echo "DNS record created successfully."
+        echo "$CURRENT_IP" > "$IP_FILE"
+    else
+        echo "Error: Failed to create DNS record."
+        echo "Response: $CREATE_RESPONSE"
+        exit 1
+    fi
+else
+    echo "Updating existing DNS record."
+    UPDATE_RESPONSE=$(curl -s -X PUT "$CF_API/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+        -H "X-Auth-Email: $CF_API_EMAIL" \
+        -H "X-Auth-Key: $CF_API_KEY" \
+        -H "Content-Type: application/json" \
+        --data "{\"type\":\"A\",\"name\":\"$RECORD_NAME.$DOMAIN\",\"content\":\"$CURRENT_IP\",\"ttl\":120,\"proxied\":false}")
+    if echo "$UPDATE_RESPONSE" | grep -q '"success":true'; then
+        echo "DNS record updated successfully."
+        echo "$CURRENT_IP" > "$IP_FILE"
+    else
+        echo "Error: Failed to update DNS record."
+        echo "Response: $UPDATE_RESPONSE"
+        exit 1
+    fi
+fi
