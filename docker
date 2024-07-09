@@ -88,8 +88,6 @@ VERSION="${VERSION#v}"
 # The channel to install from:
 #   * stable
 #   * test
-#   * edge (deprecated)
-#   * nightly (deprecated)
 DEFAULT_CHANNEL_VALUE="stable"
 if [ -z "$CHANNEL" ]; then
 	CHANNEL=$DEFAULT_CHANNEL_VALUE
@@ -148,10 +146,6 @@ esac
 
 case "$CHANNEL" in
 	stable|test)
-		;;
-	edge|nightly)
-		>&2 echo "DEPRECATED: the $CHANNEL channel has been deprecated and is no longer supported by this script."
-		exit 1
 		;;
 	*)
 		>&2 echo "unknown CHANNEL '$CHANNEL': use either stable or test."
@@ -473,6 +467,9 @@ do_install() {
 	# Print deprecation warnings for distro versions that recently reached EOL,
 	# but may still be commonly used (especially LTS versions).
 	case "$lsb_dist.$dist_version" in
+		centos.7|rhel.7)
+			deprecation_notice "$lsb_dist" "$dist_version"
+			;;
 		debian.stretch|debian.jessie)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
