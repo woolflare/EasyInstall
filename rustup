@@ -41,9 +41,9 @@ Usage: rustup-init[EXE] [OPTIONS]
 
 Options:
   -v, --verbose
-          Enable verbose output
+          Set log level to 'DEBUG' if 'RUSTUP_LOG' is unset
   -q, --quiet
-          Disable progress output, limit console logger level to 'WARN' if 'RUSTUP_LOG' is unset
+          Disable progress output, set log level to 'WARN' if 'RUSTUP_LOG' is unset
   -y
           Disable confirmation prompt
       --default-host <DEFAULT_HOST>
