@@ -4,6 +4,11 @@
         "website": "https://github.com/acmesh-official/acme.sh",
         "installer_source": "https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh"
     },
+    "bun": {
+        "description": "Incredibly fast JavaScript runtime, bundler, test runner, and package manager",
+        "website": "https://bun.sh/",
+        "installer_source": "https://bun.sh/install"
+    },
     "ddns_cf": {
         "description": "DDNS script for Cloudflare",
         "website": "https://github.com/woolflare/EasyInstall",
