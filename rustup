@@ -719,24 +719,27 @@ check_help_for() {
 
         *darwin*)
         if check_cmd sw_vers; then
-            case $(sw_vers -productVersion) in
-                10.*)
+            local _os_version
+            local _os_major
+            _os_version=$(sw_vers -productVersion)
+            _os_major=$(echo "$_os_version" | cut -d. -f1)
+            case $_os_major in
+                10)
                     # If we're running on macOS, older than 10.13, then we always
                     # fail to find these options to force fallback
-                    if [ "$(sw_vers -productVersion | cut -d. -f2)" -lt 13 ]; then
+                    if [ "$(echo "$_os_version" | cut -d. -f2)" -lt 13 ]; then
                         # Older than 10.13
                         warn "Detected macOS platform older than 10.13"
                         return 1
                     fi
                     ;;
-                11.*)
-                    # We assume Big Sur will be OK for now
-                    ;;
                 *)
-                    # Unknown product version, warn and continue
-                    warn "Detected unknown macOS major version: $(sw_vers -productVersion)"
-                    warn "TLS capabilities detection may fail"
-                    ;;
+                    if ! { [ "$_os_major" -eq "$_os_major" ] 2>/dev/null && [ "$_os_major" -ge 11 ]; }; then
+                        # Unknown product version, warn and continue
+                        warn "Detected unknown macOS major version: $_os_version"
+                        warn "TLS capabilities detection may fail"
+                    fi
+                    ;; # We assume that macOS v11+ will always be okay.
             esac
         fi
         ;;
