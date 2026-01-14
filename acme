@@ -2358,6 +2358,7 @@ _setopt() {
   fi
   if [ ! -f "$__conf" ]; then
     touch "$__conf"
+    chmod 600 "$__conf"
   fi
   if [ -n "$(_tail_c 1 <"$__conf")" ]; then
     echo >>"$__conf"
@@ -6671,6 +6672,7 @@ _initconf() {
 #NO_TIMESTAMP=1
 
     " >"$ACCOUNT_CONF_PATH"
+    chmod 600 "$ACCOUNT_CONF_PATH"
   fi
 }
 
