@@ -508,7 +508,7 @@ do_install() {
 			esac
 		;;
 
-		centos|rhel)
+		centos|rhel|rocky)
 			if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
 				dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
 			fi
@@ -626,7 +626,7 @@ do_install() {
 			echo_docker_as_nonroot
 			exit 0
 			;;
-		centos|fedora|rhel)
+		centos|fedora|rhel|rocky)
 			if [ "$(uname -m)" = "s390x" ]; then
 				echo "Effective v27.5, please consult RHEL distro statement for s390x support."
 				exit 1
