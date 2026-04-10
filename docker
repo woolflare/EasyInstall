@@ -418,7 +418,7 @@ check_forked() {
 do_install() {
 	echo "# Executing docker install script, commit: $SCRIPT_COMMIT_SHA"
 
-	if command_exists docker; then
+	if [ "$REPO_ONLY" != "1" ] && command_exists docker; then
 		cat >&2 <<-'EOF'
 			Warning: the "docker" command appears to already exist on this system.
 
