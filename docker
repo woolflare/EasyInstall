@@ -301,7 +301,7 @@ start_docker_daemon() {
 		is_dry_run || >&2 echo "Using systemd to manage Docker service"
 		if (
 			is_dry_run || set -x
-			$sh_c systemctl enable --now docker.service 2>/dev/null
+			$sh_c "systemctl enable --now docker.service 2>/dev/null"
 		); then
 			is_dry_run || echo "INFO: Docker daemon enabled and started" >&2
 		else
