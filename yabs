@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Yet Another Bench Script by Mason Rowe
-# Initial Oct 2019; Last update Apr 2026
+# Initial Oct 2019; Last update May 2026
 
 # Disclaimer: This project is a work in progress. Any errors or suggestions should be
 #             relayed to me via the GitHub project page linked below.
@@ -12,7 +12,7 @@
 #             performance via fio. The script is designed to not require any dependencies
 #             - either compiled or installed - nor admin privileges to run.
 
-YABS_VERSION="v2026-04-29"
+YABS_VERSION="v2026-05-11"
 
 echo -e '# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #'
 echo -e '#              Yet-Another-Bench-Script              #'
@@ -1037,7 +1037,7 @@ function launch_geekbench {
 			printf "%-15s | %-30s\n" "Full Test" "$GEEKBENCH_URL"
 
 			if [[ -n $JSON ]]; then
-				JSON_RESULT+='{"version":'$VERSION',"single":'$GEEKBENCH_SCORES_SINGLE',"multi":'$GEEKBENCH_SCORES_MULTI
+				JSON_RESULT+='{"version":'$VERSION',"single":'${GEEKBENCH_SCORES_SINGLE:-null}',"multi":'${GEEKBENCH_SCORES_MULTI:-null}
 				JSON_RESULT+=',"url":"'$GEEKBENCH_URL'"},'
 			fi
 
