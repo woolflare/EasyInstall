@@ -4707,6 +4707,13 @@ issue() {
   else
     _cleardomainconf "Le_ChallengeAlias"
   fi
+  # Save Le_DNSSleep unconditionally here: the save inside the dns_entries
+  # branch is skipped when all authorizations are already valid (e.g. issuing
+  # the ECC twin of a just-issued RSA cert), which left the setting out of
+  # that cert's conf. https://github.com/acmesh-official/acme.sh/issues/6986
+  if [ "$Le_DNSSleep" ]; then
+    _savedomainconf "Le_DNSSleep" "$Le_DNSSleep"
+  fi
   if [ "$_preferred_chain" ]; then
     _savedomainconf "Le_Preferred_Chain" "$_preferred_chain" "base64"
   else
@@ -5312,6 +5319,8 @@ $_authorizations_map"
         fi
       fi
     elif [ "$vtype" = "$VTYPE_ALPN" ]; then
+      _ncaddr="$(_getfield "$_local_addr" "$_ncIndex")"
+      _ncIndex="$(_math $_ncIndex + 1)"
       acmevalidationv1="$(printf "%s" "$keyauthorization" | _digest "sha256" "hex")"
       _debug acmevalidationv1 "$acmevalidationv1"
       if ! _starttlsserver "$d" "" "$Le_TLSPort" "$keyauthorization" "$_ncaddr" "$acmevalidationv1"; then
@@ -5542,6 +5551,13 @@ $_authorizations_map"
     return 1
   fi
 
+  if ! _contains "$response" "$BEGIN_CERT"; then
+    response="$(echo "$response" | _dbase64 "multiline" | tr -d '\0' | _normalizeJson)"
+    _err "Signing failed: $(echo "$response" | _egrep_o '"detail":"[^"]*"')"
+    _on_issue_err "$_post_hook"
+    return 1
+  fi
+
   echo "$response" >"$CERT_PATH"
   _split_cert_chain "$CERT_PATH" "$CERT_FULLCHAIN_PATH" "$CA_CERT_PATH"
   if [ -z "$_preferred_chain" ]; then
@@ -5559,6 +5575,11 @@ $_authorizations_map"
         if ! _send_signed_request "$rel"; then
           _err "Signing failed, could not download cert: $rel"
           _err "$response"
+          continue
+        fi
+
+        if ! _contains "$response" "$BEGIN_CERT"; then
+          _debug2 "Skipping alternate cert link due to unexpected response format."
           continue
         fi
         _relcert="$CERT_PATH.alt"
@@ -5816,6 +5837,14 @@ renew() {
     Le_API="$_server"
   fi
   _info "Renewing using Le_API=$Le_API"
+
+  # Honor --local-address given on the renew/renewAll command line: it overrides
+  # the value saved at issue time (and gets re-saved by issue() below), so certs
+  # issued before the machine gained multiple addresses can still be renewed.
+  # https://github.com/acmesh-official/acme.sh/issues/7009
+  if [ "$_local_address" ]; then
+    Le_LocalAddress="$_local_address"
+  fi
 
   _clearAPI
   _clearCA
@@ -6449,6 +6478,7 @@ _install_win_taskscheduler() {
   _lesh="$1"
   _centry="$2"
   _randomminute="$3"
+  _randomhour="$4"
   if ! _exists cygpath; then
     _err "cygpath not found"
     return 1
@@ -6518,7 +6548,7 @@ installcronjob() {
   fi
   _t=$(_time)
   random_minute=$(_math $_t % 60)
-  random_hour=$(_math $_t / 60 % 24)
+  random_hour=$(_math $_t / 60 % 6)
 
   if ! _exists "$_CRONTAB" && _exists "fcrontab"; then
     _CRONTAB="fcrontab"
@@ -6527,7 +6557,7 @@ installcronjob() {
   if ! _exists "$_CRONTAB"; then
     if _exists cygpath && _exists schtasks.exe; then
       _info "It seems you are on Windows, let's install the Windows scheduler task."
-      if _install_win_taskscheduler "$lesh" "$_c_entry" "$random_minute"; then
+      if _install_win_taskscheduler "$lesh" "$_c_entry" "$random_minute" "$random_hour"; then
         _info "Successfully installed Windows scheduler task."
         return 0
       else
@@ -6549,7 +6579,7 @@ installcronjob() {
     fi
     $_CRONTAB -l 2>/dev/null | {
       cat
-      echo "$random_minute $random_hour * * * $lesh --cron --home \"$LE_WORKING_DIR\" $_c_entry> /dev/null"
+      echo "$random_minute $random_hour,$(_math $random_hour + 6),$(_math $random_hour + 12),$(_math $random_hour + 18) * * * $lesh --cron --home \"$LE_WORKING_DIR\" $_c_entry> /dev/null"
     } | $_CRONTAB_STDIN
   fi
   if [ "$?" != "0" ]; then
@@ -7177,6 +7207,12 @@ install() {
 
   if [ "$_DEFAULT_CERT_HOME" != "$CERT_HOME" ]; then
     _saveaccountconf "CERT_HOME" "$CERT_HOME"
+    # Create the custom cert home now instead of on first issuance, so the
+    # user can see --install honored it.
+    # https://github.com/acmesh-official/acme.sh/issues/4756
+    if [ ! -d "$CERT_HOME" ]; then
+      mkdir -p "$CERT_HOME"
+    fi
   fi
 
   if [ "$_DEFAULT_ACCOUNT_KEY_PATH" != "$ACCOUNT_KEY_PATH" ]; then
@@ -7498,8 +7534,8 @@ Parameters:
 
   --dnssleep <seconds>              The time in seconds to wait for all the txt records to propagate in dns api mode.
                                       It's not necessary to use this by default, $PROJECT_NAME polls dns status by DOH automatically.
-  -k, --keylength <bits>            Specifies the domain key length: 2048, 3072, 4096, 8192 or ec-256, ec-384, ec-521.
-  -ak, --accountkeylength <bits>    Specifies the account key length: 2048, 3072, 4096
+  -k, --keylength <bits>            Specifies the domain key length: 2048, 3072, 4096, 8192 or ec-256 (default), ec-384, ec-521.
+  -ak, --accountkeylength <bits>    Specifies the account key length: 2048, 3072, 4096, 8192 or ec-256 (default), ec-384, ec-521.
   --log [file]                      Specifies the log file. Defaults to \"$DEFAULT_LOG_FILE\" if argument is omitted.
   --log-level <1|2>                 Specifies the log level, default is $DEFAULT_LOG_LEVEL.
   --syslog <0|3|6|7>                Syslog level, 0: disable syslog, 3: error, 6: info, 7: debug.
@@ -7717,9 +7753,16 @@ _checkSudo() {
       return 0
     fi
     if [ -n "$SUDO_COMMAND" ]; then
-      #it's a normal user doing "sudo su", or `sudo -i` or `sudo -s`, or `sudo su acmeuser1`
-      _endswith "$SUDO_COMMAND" /bin/su || _contains "$SUDO_COMMAND" "/bin/su " || grep "^$SUDO_COMMAND\$" /etc/shells >/dev/null 2>&1
-      return $?
+      #The SUDO_* env vars are often inherited into shells that were not
+      #started as `sudo acme.sh` at all (e.g. `sudo su - user`, or
+      #`sudo pct enter <VID>` on Proxmox, which copies them into the
+      #container). Only warn when sudo was used to run acme.sh itself;
+      #anything else means the sudo happened further up and is fine.
+      #https://github.com/acmesh-official/acme.sh/issues/6400
+      if _contains "$SUDO_COMMAND" "$PROJECT_ENTRY"; then
+        return 1
+      fi
+      return 0
     fi
     #otherwise
     return 1
