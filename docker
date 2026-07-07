@@ -638,10 +638,6 @@ do_install() {
 			exit 0
 			;;
 		centos|fedora|rhel|rocky)
-			if [ "$(uname -m)" = "s390x" ]; then
-				echo "Effective v27.5, please consult RHEL distro statement for s390x support."
-				exit 1
-			fi
 			repo_file_url="$DOWNLOAD_URL/linux/$lsb_dist/$REPO_FILE"
 			(
 				if ! is_dry_run; then
