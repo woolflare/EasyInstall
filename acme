@@ -1443,13 +1443,13 @@ _readSubjectAltNamesFromCSR() {
   _debug _dnsAltnames "$_dnsAltnames"
 
   # escape the wildcard '*' so it is not taken as a regex operator by grep/sed below
-  _excapedAlgnames="$(echo "$_dnsAltnames" | tr '*' '#')"
-  _debug _excapedAlgnames "$_excapedAlgnames"
+  _escapedAltnames="$(echo "$_dnsAltnames" | tr '*' '#')"
+  _debug _escapedAltnames "$_escapedAltnames"
   _escapedSubject="$(echo "$_csrsubj" | tr '*' '#')"
   _debug _escapedSubject "$_escapedSubject"
-  if _contains "$_excapedAlgnames," "DNS:$_escapedSubject,"; then
+  if _contains "$_escapedAltnames," "DNS:$_escapedSubject,"; then
     _debug "AltNames contains subject"
-    _dnsAltnames="$(echo "$_excapedAlgnames," | sed "s/DNS:$_escapedSubject,//g" | tr '#' '*' | sed "s/,\$//g")"
+    _dnsAltnames="$(echo "$_escapedAltnames," | sed "s/DNS:$_escapedSubject,//g" | tr '#' '*' | sed "s/,\$//g")"
     _debug _dnsAltnames "$_dnsAltnames"
   else
     _debug "AltNames doesn't contain subject"
@@ -2590,6 +2590,13 @@ _migratedeployconf() {
 #key  value  base64encode
 _savedeployconf() {
   _savedomainconf "SAVED_$1" "$2" "$3"
+  #remove later
+  _cleardomainconf "$1"
+}
+
+#key
+_cleardeployconf() {
+  _cleardomainconf "SAVED_$1"
   #remove later
   _cleardomainconf "$1"
 }
@@ -5343,6 +5350,8 @@ $_authorizations_map"
         fi
         _d_alias="$(_getfield "$_challenge_alias" "$_alias_index")"
         test "$_d_alias" = "$NO_VALUE" && _d_alias=""
+        # strip the trailing dot of a fully-qualified alias domain
+        _d_alias="${_d_alias%.}"
         _alias_index="$(_math "$_alias_index" + 1)"
         _debug "_d_alias" "$_d_alias"
         if [ "$_d_alias" ]; then
@@ -7411,9 +7420,9 @@ _precheck() {
   fi
 
   if ! _exists "socat" && ! _exists "python" && ! _exists "python2" && ! _exists "python3"; then
-    _err "It is recommended to install socat or python first."
-    _err "We use socat or python for the standalone server, which is used for standalone mode."
-    _err "If you don't want to use standalone mode, you may ignore this warning."
+    _info "It is recommended to install socat or python first."
+    _info "We use socat or python for the standalone server, which is used for standalone mode."
+    _info "If you don't want to use standalone mode, you may ignore this warning."
   fi
 
   return 0
@@ -7756,6 +7765,14 @@ _send_notify() {
       continue
     fi
     if ! (
+      # The dns/deploy hooks export _H1.._H5 in the main process, so the
+      # values are inherited here. Clear them: a stale Authorization header
+      # from another service must not leak into the notify request.
+      export _H1=""
+      export _H2=""
+      export _H3=""
+      export _H4=""
+      export _H5=""
       if ! . "$_n_hook_file"; then
         _err "Error loading file $_n_hook_file. Please check your API file and try again."
         return 1
