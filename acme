@@ -5838,7 +5838,7 @@ $_authorizations_map"
     return 1
   fi
 
-  echo "$response" >"$CERT_PATH"
+  echo "$response" | _strip_blank_lines >"$CERT_PATH"
   _split_cert_chain "$CERT_PATH" "$CERT_FULLCHAIN_PATH" "$CA_CERT_PATH"
   if [ -z "$_preferred_chain" ]; then
     _preferred_chain=$(_readcaconf DEFAULT_PREFERRED_CHAIN)
@@ -5865,7 +5865,7 @@ $_authorizations_map"
         _relcert="$CERT_PATH.alt"
         _relfullchain="$CERT_FULLCHAIN_PATH.alt"
         _relca="$CA_CERT_PATH.alt"
-        echo "$response" >"$_relcert"
+        echo "$response" | _strip_blank_lines >"$_relcert"
         _split_cert_chain "$_relcert" "$_relfullchain" "$_relca"
         if [ "$DEBUG" ]; then
           _debug "rel chain issuers: " "$(_get_chain_issuers "$_relfullchain")"
@@ -6072,6 +6072,15 @@ $_authorizations_map"
 }
 
 #in_out_cert   out_fullchain   out_ca
+#Reads a PEM chain from stdin, prints it without the blank lines.
+#Some CAs (Let's Encrypt) separate the certificates of a chain with a blank
+#line, others (ZeroSSL) don't. The blank lines are valid PEM (RFC 7468), but
+#some devices and APIs reject them, so the certs are stored back to back.
+#https://github.com/acmesh-official/acme.sh/issues/1940
+_strip_blank_lines() {
+  sed '/^[[:space:]]*$/d'
+}
+
 _split_cert_chain() {
   _certf="$1"
   _fullchainf="$2"
