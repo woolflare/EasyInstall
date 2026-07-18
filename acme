@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-VER=3.1.4
+VER=3.1.5
 
 PROJECT_NAME="acme.sh"
 
@@ -6078,7 +6078,10 @@ $_authorizations_map"
 #some devices and APIs reject them, so the certs are stored back to back.
 #https://github.com/acmesh-official/acme.sh/issues/1940
 _strip_blank_lines() {
-  sed '/^[[:space:]]*$/d'
+  #spell out space and tab: Solaris sed treats [[:space:]] as a literal
+  #bracket set and silently stops matching the blank lines
+  _sbl_tab="$(printf '\t')"
+  sed "/^[ $_sbl_tab]*\$/d"
 }
 
 _split_cert_chain() {
