@@ -634,7 +634,11 @@ do_install() {
 				if ! is_dry_run; then
 					set -x
 				fi
-				$sh_c "DEBIAN_FRONTEND=noninteractive apt-get -y -qq install $pkgs >/dev/null"
+				apt_flags="-y -qq"
+				if [ -n "$pkg_version" ]; then
+					apt_flags="$apt_flags --allow-downgrades"
+				fi
+				$sh_c "DEBIAN_FRONTEND=noninteractive apt-get $apt_flags install $pkgs >/dev/null"
 			)
 			if [ "$NO_AUTOSTART" != "1" ]; then
 				start_docker_daemon
