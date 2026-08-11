@@ -549,7 +549,7 @@ do_install() {
 		ubuntu.focal|ubuntu.bionic|ubuntu.xenial|ubuntu.trusty)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
-		ubuntu.oracular|ubuntu.mantic|ubuntu.lunar|ubuntu.kinetic|ubuntu.impish|ubuntu.hirsute|ubuntu.groovy|ubuntu.eoan|ubuntu.disco|ubuntu.cosmic)
+		ubuntu.questing|ubuntu.oracular|ubuntu.mantic|ubuntu.lunar|ubuntu.kinetic|ubuntu.impish|ubuntu.hirsute|ubuntu.groovy|ubuntu.eoan|ubuntu.disco|ubuntu.cosmic)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
 		fedora.*)
