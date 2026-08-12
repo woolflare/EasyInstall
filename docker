@@ -94,6 +94,13 @@ set -e
 #
 # Note: Starting the service requires appropriate privileges to manage system services.
 #
+# Installing docker-sbx
+#
+# Set the SBX environment variable to "1" to also install the docker-sbx
+# package alongside the regular Docker Engine packages:
+#
+#   $ curl -fsSL https://get.docker.com | sudo SBX=1 sh
+#
 # ==============================================================================
 
 
@@ -131,6 +138,7 @@ mirror=''
 DRY_RUN=${DRY_RUN:-}
 REPO_ONLY=${REPO_ONLY:-0}
 NO_AUTOSTART=${NO_AUTOSTART:-0}
+SBX=${SBX:-0}
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--channel)
@@ -631,6 +639,9 @@ do_install() {
 				if version_gte "28.2"; then
 					pkgs="$pkgs docker-model-plugin"
 				fi
+				if [ "$SBX" = "1" ]; then
+					pkgs="$pkgs docker-sbx"
+				fi
 				if ! is_dry_run; then
 					set -x
 				fi
@@ -742,6 +753,9 @@ do_install() {
 				fi
 				if version_gte "23.0"; then
 						pkgs="$pkgs docker-buildx-plugin docker-model-plugin"
+				fi
+				if [ "$SBX" = "1" ]; then
+					pkgs="$pkgs docker-sbx"
 				fi
 				if ! is_dry_run; then
 					set -x
