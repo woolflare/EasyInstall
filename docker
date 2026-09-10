@@ -565,7 +565,7 @@ do_install() {
 		centos.8|centos.7|rhel.7)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
-		debian.buster|debian.stretch|debian.jessie)
+		debian.bullseye|debian.buster|debian.stretch|debian.jessie)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
 		raspbian.buster|raspbian.stretch|raspbian.jessie)
